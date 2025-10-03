@@ -1,0 +1,22 @@
+<?php require_once __DIR__ . "/../../includes/layout.php"; ?>
+<?php require_once __DIR__ . "/../../includes/auth.php"; auth(); ?>
+<?php
+$db = new PDO('sqlite:../../../db/tjw.sqlite');
+$posts = $db->query("SELECT id, title, slug, published_at FROM posts ORDER BY created_at DESC")->fetchAll();
+?>
+<h1>📚 Wpisy blogowe</h1>
+<p><a href="add.php">➕ Dodaj nowy wpis</a></p>
+<ul>
+<?php foreach ($posts as $p): ?>
+  <li>
+    <strong><?= htmlspecialchars($p['title']) ?></strong>
+    <?php if ($p['published_at']): ?>
+      <small>(<?= $p['published_at'] ?>)</small>
+    <?php else: ?>
+      <small>(nieopublikowany)</small>
+    <?php endif; ?>
+    — <a href="edit.php?slug=<?= urlencode($p['slug']) ?>">✏️ Edytuj</a>
+  </li>
+<?php endforeach; ?>
+</ul>
+<p><a href="/admin/reset_password.php">🔑 Zmień hasło</a></p>

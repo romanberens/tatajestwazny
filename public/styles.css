@@ -1,0 +1,24 @@
+body {
+  font-family: sans-serif;
+  background-color: #fffaf3;
+  color: #222;
+  padding: 2em;
+  margin: 0;
+}
+
+header h1 {
+  color: #222;
+}
+
+main {
+  max-width: 600px;
+  margin: auto;
+  text-align: center;
+}
+
+footer {
+  margin-top: 2em;
+  text-align: center;
+  font-size: 0.9em;
+  color: #888;
+}
