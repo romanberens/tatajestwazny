@@ -1,42 +1,73 @@
 <?php
-require __DIR__.'/includes/layout.php';
-$db = new PDO('sqlite:../db/tjw.sqlite');
+require __DIR__ . '/../src/bootstrap.php';
 
-$uri = $_SERVER['REQUEST_URI'];
+$db = new Db();
+$pdo = $db->pdo;
+$blocksRepository = new Blocks($pdo);
+$pagesRepository = new PagesRepository($pdo);
+$menuRepository = new MenuRepository($pdo);
+$postsRepository = new PostsRepository($pdo);
 
-// 📄 /blog/<slug>
-if (preg_match('#^/blog/([a-z0-9\-]+)$#', $uri, $m)) {
-  $slug = $m[1];
-  $stmt = $db->prepare("SELECT title, body_html FROM posts WHERE slug = ? AND published_at IS NOT NULL");
-  $stmt->execute([$slug]);
-  $post = $stmt->fetch(PDO::FETCH_ASSOC);
-  if (!$post) {
+$path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$path = rtrim($path, '/') ?: '/';
+
+$navItems = $menuRepository->visible();
+
+if ($path === '/') {
+    render('home.php', [
+        'title' => 'Tata Jest Ważny',
+        'navItems' => $navItems,
+        'misja' => $blocksRepository->byRegion('misja'),
+        'jak_pomagam' => $blocksRepository->byRegion('jak_pomagam'),
+        'szybka_pomoc' => $blocksRepository->byRegion('szybka_pomoc'),
+        'dla_kogo' => $blocksRepository->byRegion('dla_kogo'),
+    ]);
+    return;
+}
+
+if ($path === '/blog') {
+    render('blog_list.php', [
+        'title' => 'Blog',
+        'navItems' => $navItems,
+        'posts' => $postsRepository->published(),
+    ]);
+    return;
+}
+
+if (preg_match('#^/blog/([a-z0-9\-]+)$#', $path, $matches)) {
+    $post = $postsRepository->findBySlug($matches[1]);
+    if ($post) {
+        render('blog_post.php', [
+            'title' => $post['title'],
+            'navItems' => $navItems,
+            'post' => $post,
+        ]);
+        return;
+    }
+
     http_response_code(404);
-    layout("404", "<h1>Nie znaleziono wpisu</h1>");
-    exit;
-  }
-  layout($post['title'], $post['body_html']);
-  exit;
+    render('404.php', [
+        'title' => 'Nie znaleziono wpisu',
+        'navItems' => $navItems,
+    ]);
+    return;
 }
 
-// 🗂️ /blog (lista)
-if ($uri === '/blog') {
-  $posts = $db->query("SELECT slug, title, excerpt, published_at FROM posts WHERE published_at IS NOT NULL ORDER BY published_at DESC")->fetchAll();
-  $html = "<h1>📚 Blog</h1><ul>";
-  foreach ($posts as $p) {
-    $html .= "<li><a href='/blog/" . htmlspecialchars($p['slug']) . "'><strong>" . htmlspecialchars($p['title']) . "</strong></a>";
-    if ($p['excerpt']) $html .= "<p>" . htmlspecialchars($p['excerpt']) . "</p>";
-    $html .= "</li>";
-  }
-  $html .= "</ul>";
-  layout("Blog", $html);
-  exit;
+$slug = trim($path, '/');
+if ($slug !== '') {
+    $page = $pagesRepository->findBySlug($slug);
+    if ($page) {
+        render('page.php', [
+            'title' => $page['title'],
+            'navItems' => $navItems,
+            'page' => $page,
+        ]);
+        return;
+    }
 }
 
-// 🏠 domyślnie: strona główna (bloki)
-$blocks = $db->query("SELECT title, body_html FROM content_blocks ORDER BY region, position")->fetchAll();
-$body = '';
-foreach ($blocks as $b) {
-  $body .= "<h2>".htmlspecialchars($b['title'])."</h2>\n".$b['body_html']."\n";
-}
-layout("TataJestWazny", $body);
+http_response_code(404);
+render('404.php', [
+    'title' => 'Strona nie istnieje',
+    'navItems' => $navItems,
+]);
