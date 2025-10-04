@@ -8,6 +8,6 @@
     <?php endif; ?>
   </header>
   <div class="prose prose-lg prose-orange max-w-none text-slate-800 mt-8">
-    <?= $post['body_html'] ?>
+    <?= safe_html($post['body_html'] ?? '') ?>
   </div>
 </article>
