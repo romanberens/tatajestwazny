@@ -1,6 +1,13 @@
 <?php
-session_start();
+require_once __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../src/helpers.php';
 require_once __DIR__ . '/../../includes/load_env.php';
+
+ensure_secure_session();
+
+if (empty($_SESSION['csrf'])) {
+    $_SESSION['csrf'] = bin2hex(random_bytes(16));
+}
 
 $hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
 if (!$hash) {
@@ -10,22 +17,53 @@ if (!$hash) {
 }
 
 if (($_GET['action'] ?? null) === 'logout') {
-    session_destroy();
+    logout();
     header('Location: /admin/auth.php');
     exit;
 }
 
+$attemptState = $_SESSION['auth_attempts'] ?? ['count' => 0, 'locked_until' => 0];
+$now = time();
+
+if (!empty($attemptState['locked_until']) && $attemptState['locked_until'] <= $now) {
+    $attemptState = ['count' => 0, 'locked_until' => 0];
+    $_SESSION['auth_attempts'] = $attemptState;
+}
+
 $error = null;
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+if ($attemptState['locked_until'] > $now) {
+    $remaining = $attemptState['locked_until'] - $now;
+    $error = 'Zbyt wiele prób logowania. Spróbuj ponownie za ' . max(1, $remaining) . ' sekund.';
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$error) {
+    require_post_csrf();
+
     $password = $_POST['password'] ?? '';
     if (password_verify($password, $hash)) {
+        force_regenerate_session();
         $_SESSION['logged_in'] = true;
-        $_SESSION['logged_in_at'] = time();
+        $_SESSION['logged_in_at'] = $now;
+        $_SESSION['csrf'] = bin2hex(random_bytes(16));
+        unset($_SESSION['auth_attempts']);
         header('Location: /admin/');
         exit;
     }
-    $error = 'Nieprawidłowe hasło. Spróbuj ponownie.';
+
+    $attemptState['count'] = ($attemptState['count'] ?? 0) + 1;
+    if ($attemptState['count'] >= 5) {
+        $attemptState['locked_until'] = $now + 300;
+        $error = 'Zbyt wiele prób logowania. Spróbuj ponownie za 300 sekund.';
+    } else {
+        $error = 'Nieprawidłowe hasło. Spróbuj ponownie.';
+    }
+    $_SESSION['auth_attempts'] = $attemptState;
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $error) {
+    require_post_csrf();
 }
+
+$csrfToken = $_SESSION['csrf'];
 ?>
 <!doctype html>
 <html lang="pl">
@@ -52,10 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     <?php endif; ?>
     <form method="post" class="space-y-4">
+      <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>">
       <label class="block text-sm font-medium text-slate-600">Hasło
         <input type="password" name="password" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 shadow-inner focus:border-orange-400 focus:ring-0" placeholder="••••••••" required>
       </label>
-      <button type="submit" class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 rounded-xl bg-orange-500 text-white font-semibold shadow-soft hover:bg-orange-600 transition">Zaloguj się</button>
+      <button type="submit" class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 rounded-xl bg-orange-500 text-white font-semibold shadow-soft hover:bg-orange-600 transition"<?= $error && $attemptState['locked_until'] > $now ? ' disabled' : '' ?>>Zaloguj się</button>
     </form>
     <p class="text-xs text-center text-slate-400">Masz problem z logowaniem? Skontaktuj się z opiekunem technicznym.</p>
   </div>
