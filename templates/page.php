@@ -5,6 +5,6 @@
     <h1 class="text-4xl font-semibold text-slate-900 leading-tight mt-3"><?= htmlspecialchars($page['title']) ?></h1>
   </header>
   <div class="prose prose-lg prose-orange max-w-none text-slate-800 mt-8">
-    <?= $page['body_html'] ?>
+    <?= safe_html($page['body_html'] ?? '') ?>
   </div>
 </article>

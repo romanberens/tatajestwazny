@@ -4,7 +4,7 @@
   <section class="bg-white rounded-2xl p-6 shadow-soft mb-6">
     <h2 class="text-2xl font-semibold mb-3"><?= htmlspecialchars($misjaBlock['title'] ?? 'Misja') ?></h2>
     <div class="prose prose-orange max-w-none text-slate-800">
-      <?= $misjaBlock['body_html'] ?? '<p>Uzupełnij treść w panelu.</p>' ?>
+      <?= safe_html($misjaBlock['body_html'] ?? '<p>Uzupełnij treść w panelu.</p>') ?>
     </div>
   </section>
 
@@ -15,7 +15,7 @@
       <?php foreach ($jak_pomagam as $b): ?>
         <div class="mb-5">
           <?php if (!empty($b['title'])): ?><h3 class="text-lg font-semibold mb-2"><?= htmlspecialchars($b['title']) ?></h3><?php endif; ?>
-          <div class="prose max-w-none"><?= $b['body_html'] ?></div>
+          <div class="prose max-w-none"><?= safe_html($b['body_html'] ?? '') ?></div>
         </div>
       <?php endforeach; ?>
     </article>
@@ -24,7 +24,7 @@
     <?php $szybkaPomocBlock = $szybka_pomoc[0] ?? null; ?>
     <aside class="bg-white rounded-2xl p-6 shadow-soft">
       <h3 class="text-lg font-semibold mb-3"><?= htmlspecialchars($szybkaPomocBlock['title'] ?? 'Szybka pomoc') ?></h3>
-      <div class="prose max-w-none"><?= $szybkaPomocBlock['body_html'] ?? '' ?></div>
+      <div class="prose max-w-none"><?= safe_html($szybkaPomocBlock['body_html'] ?? '') ?></div>
     </aside>
   </section>
 
@@ -32,6 +32,6 @@
   <?php $dlaKogoBlock = $dla_kogo[0] ?? null; ?>
   <section class="bg-white rounded-2xl p-6 shadow-soft">
     <h2 class="text-2xl font-semibold mb-3"><?= htmlspecialchars($dlaKogoBlock['title'] ?? 'Dla kogo') ?></h2>
-    <div class="prose max-w-none"><?= $dlaKogoBlock['body_html'] ?? '' ?></div>
+    <div class="prose max-w-none"><?= safe_html($dlaKogoBlock['body_html'] ?? '') ?></div>
   </section>
 </main>

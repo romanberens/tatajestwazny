@@ -13,14 +13,41 @@ $path = rtrim($path, '/') ?: '/';
 
 $navItems = $menuRepository->visible();
 
+$sanitizeRichItem = static function (?array $item): ?array {
+    if ($item === null) {
+        return null;
+    }
+
+    foreach ($item as $key => $value) {
+        if (is_string($value) && substr($key, -5) === '_html') {
+            $item[$key] = safe_html($value);
+        }
+    }
+
+    return $item;
+};
+
+$sanitizeCollection = static function (?array $items) use ($sanitizeRichItem): array {
+    if (!is_array($items)) {
+        return [];
+    }
+
+    $sanitized = [];
+    foreach ($items as $key => $item) {
+        $sanitized[$key] = is_array($item) ? $sanitizeRichItem($item) : $item;
+    }
+
+    return $sanitized;
+};
+
 if ($path === '/') {
     render('home.php', [
         'title' => 'Tata Jest Ważny',
         'navItems' => $navItems,
-        'misja' => $blocksRepository->byRegion('misja'),
-        'jak_pomagam' => $blocksRepository->byRegion('jak_pomagam'),
-        'szybka_pomoc' => $blocksRepository->byRegion('szybka_pomoc'),
-        'dla_kogo' => $blocksRepository->byRegion('dla_kogo'),
+        'misja' => $sanitizeCollection($blocksRepository->byRegion('misja')),
+        'jak_pomagam' => $sanitizeCollection($blocksRepository->byRegion('jak_pomagam')),
+        'szybka_pomoc' => $sanitizeCollection($blocksRepository->byRegion('szybka_pomoc')),
+        'dla_kogo' => $sanitizeCollection($blocksRepository->byRegion('dla_kogo')),
     ]);
     return;
 }
@@ -29,7 +56,7 @@ if ($path === '/blog') {
     render('blog_list.php', [
         'title' => 'Blog',
         'navItems' => $navItems,
-        'posts' => $postsRepository->published(),
+        'posts' => $sanitizeCollection($postsRepository->published()),
     ]);
     return;
 }
@@ -40,7 +67,7 @@ if (preg_match('#^/blog/([a-z0-9\-]+)$#', $path, $matches)) {
         render('blog_post.php', [
             'title' => $post['title'],
             'navItems' => $navItems,
-            'post' => $post,
+            'post' => $sanitizeRichItem($post),
         ]);
         return;
     }
@@ -60,7 +87,7 @@ if ($slug !== '') {
         render('page.php', [
             'title' => $page['title'],
             'navItems' => $navItems,
-            'page' => $page,
+            'page' => $sanitizeRichItem($page),
         ]);
         return;
     }
