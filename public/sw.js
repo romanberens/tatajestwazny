@@ -16,11 +16,21 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   const req = e.request;
+  if (req.method !== 'GET') {
+    return;
+  }
+
+  const url = new URL(req.url);
+  if (url.origin === self.location.origin && url.pathname.startsWith('/admin/')) {
+    return;
+  }
+
   const isHTML = req.headers.get('accept')?.includes('text/html');
   if (isHTML) {
     e.respondWith(
       fetch(req).then(res => {
-        caches.open(CACHE).then(c => c.put(req, res.clone()));
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy));
         return res;
       }).catch(() => caches.match('/offline.php'))
     );
