@@ -1,0 +1,195 @@
+Czas: pią, 24 paź 2025, 23:06:17 CEST
+=========================================
+
+## 🧩 Informacje systemowe
+Linux dell 6.1.0-40-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64 GNU/Linux
+Distributor ID:	Debian
+Description:	Debian GNU/Linux 12 (bookworm)
+Release:	12
+Codename:	bookworm
+
+## 📦 Docker i kontenery
+NAMES                    STATUS                 PORTS
+tjw_nginx                Up 2 hours             80/tcp
+tjw_php                  Up 2 hours             9000/tcp
+traefik                  Up 2 hours             0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:443->443/tcp, [::]:443->443/tcp, 0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+webmajster-portal-1      Up 2 hours             3000/tcp
+webmajster-generator-1   Up 2 hours             8081/tcp
+webmajster-agent-1       Up 2 hours             8085/tcp
+lab_nginx                Up 2 hours             80/tcp
+lab_php                  Up 2 hours             9000/tcp
+nc_app                   Up 2 hours             80/tcp
+nc_cron                  Up 2 hours             
+nc_db                    Up 2 hours (healthy)   
+nc_redis                 Up 2 hours (healthy)   
+
+## ⚙️ PHP w kontenerze (tjw_php)
+PHP 8.3.26 (cli) (built: Oct  8 2025 22:48:31) (NTS)
+Copyright (c) The PHP Group
+Zend Engine v4.3.26, Copyright (c) Zend Technologies
+    with Zend OPcache v8.3.26, Copyright (c), by Zend Technologies
+curl
+mbstring
+pdo_sqlite
+sqlite3
+
+## 📂 Struktura katalogów aplikacji
+/var/www/tatajestwazny/app
+├── add_auth_include.sh
+├── admin_password_report.log
+├── analyze_admin_auth.sh
+├── analyze_auth.php
+├── auth_analysis.log
+├── config
+│   ├── config.php
+│   ├── nginx
+│   │   └── tatajestwazny.local
+│   └── nginx.conf
+├── cookies.txt
+├── db
+│   ├── init.sql
+│   └── tjw.sqlite
+├── debug_password_hash.sh
+├── deploy_admin_integration.sh
+├── deploy_admin_panel.sh
+├── deploy_admin_password_reset.sh
+├── deploy_auth_and_blog_security.sh
+├── deploy_auth_module.sh
+├── deploy_blog_admin.sh
+├── deploy_blog_module.sh
+├── deploy_layout_module.sh
+├── deploy_menu_module.sh
+├── deploy_pages_module.sh
+├── diagnose_admin_integrity.sh
+├── diagnose_admin_php.sh
+├── diagnose_cms.sh
+├── diagnose_tjw.sh
+├── explain_and_set_admin_password.sh
+├── fix_admin_blog_layout.sh
+├── fix_auth_php.sh
+├── fix_require_once.sh
+├── fix_requires.sh
+├── full_auth_debug.sh
+├── includes
+│   ├── auth.php
+│   ├── footer.php
+│   ├── header.php
+│   ├── layout.php
+│   └── load_env.php
+├── init_tjw.sh
+├── public
+│   ├── admin
+│   │   ├── auth.php
+│   │   ├── index.php
+│   │   └── reset_password.php
+│   ├── apply_marzena_copy.sh
+│   ├── auth.php
+│   ├── deploy_tjw.sh
+│   ├── icons
+│   │   ├── icon-192.png
+│   │   └── icon-512.png
+│   ├── includes
+│   │   ├── footer.php
+│   │   ├── header.php
+│   │   └── layout.php
+│   ├── index.php
+│   ├── main.js
+│   ├── manifest.webmanifest
+│   ├── offline.php
+│   ├── sections
+│   │   ├── blog.php
+│   │   ├── home.php
+│   │   └── kontakt.php
+│   ├── style.css
+│   ├── styles.css
+│   └── sw.js
+├── README.md
+├── reset_admin_password.sh
+├── setup_tjw.sh
+├── src
+│   ├── AdminHandlers.php
+│   ├── Blocks.php
+│   ├── bootstrap.php
+│   ├── Db.php
+│   ├── helpers.php
+│   ├── Repositories
+│   │   ├── MenuRepository.php
+│   │   ├── PagesRepository.php
+│   │   └── PostsRepository.php
+│   └── Stats.php
+├── templates
+│   ├── 404.php
+│   ├── admin_block_form.php
+│   ├── admin_blocks_list.php
+│   ├── admin_dashboard.php
+│   ├── admin_layout.php
+│   ├── admin_menu_form.php
+│   ├── admin_menu_list.php
+│   ├── admin_pages_form.php
+│   ├── admin_pages_list.php
+│   ├── admin_posts_form.php
+│   ├── admin_posts_list.php
+│   ├── admin_settings.php
+│   ├── blog_list.php
+│   ├── blog_post.php
+│   ├── home.php
+│   ├── layout.php
+│   └── page.php
+├── test_admin_panel.sh
+├── test_auth_env.sh
+├── test_cookies.txt
+├── verify_admin_auth_runtime.log
+└── verify_admin_auth_runtime.sh
+
+13 directories, 93 files
+
+## 🔑 Uprawnienia plików kluczowych
+-rw-r--r-- 1 root  root  3455 10-24 00:06 /var/www/tatajestwazny/app/includes/auth.php
+-rw-r--r-- 1 root  root  6902 10-23 23:52 /var/www/tatajestwazny/app/public/admin/index.php
+-rw-r--r-- 1 root  root  4280 10-24 00:12 /var/www/tatajestwazny/app/src/AdminHandlers.php
+-rwxrwxrwx 1 roman roman 1975 10-23 15:22 /var/www/tatajestwazny/app/src/Blocks.php
+-rwxrwxrwx 1 roman roman  868 10-23 22:50 /var/www/tatajestwazny/app/src/bootstrap.php
+-rwxrwxrwx 1 roman roman  606 10-23 15:22 /var/www/tatajestwazny/app/src/Db.php
+-rw-r--r-- 1 root  root  5408 10-23 23:44 /var/www/tatajestwazny/app/src/helpers.php
+-rw-r--r-- 1 root  root   680 10-23 18:47 /var/www/tatajestwazny/app/src/Stats.php
+
+## 🔧 Zawartość .env (bez haseł)
+Brak pliku .env
+
+## 🗃️ Baza danych SQLite
+-rwxrwxrwx 1 www-data www-data 56K 10-23 17:27 /var/www/tatajestwazny/app/db/tjw.sqlite
+content_blocks
+sqlite_sequence
+nav_items
+_health
+pages
+menu_items
+posts
+test
+
+Przykładowe kolumny z tabel 'pages' i 'blocks':
+0|id|INTEGER|0||1
+1|slug|TEXT|1||0
+2|title|TEXT|1||0
+3|body_html|TEXT|1||0
+4|created_at|TEXT|1|CURRENT_TIMESTAMP|0
+5|updated_at|TEXT|1|CURRENT_TIMESTAMP|0
+
+## 🧪 Test połączenia PDO w kontenerze PHP
+PDO SQLite: OK
+Tabele: content_blocks, sqlite_sequence, nav_items, _health, pages, menu_items, posts, test
+
+## 📜 Wykryte funkcje obsługi POST
+/var/www/tatajestwazny/app/src/AdminHandlers.php:    function handleBlocksPost($action, $blocksRepository = null)
+/var/www/tatajestwazny/app/src/AdminHandlers.php:    function handlePagesPost($action, $pagesRepository = null)
+/var/www/tatajestwazny/app/src/AdminHandlers.php:    function handleMenuPost($action, $menuRepository = null)
+/var/www/tatajestwazny/app/src/AdminHandlers.php:    function handleBlogPost($action, $postsRepository = null)
+/var/www/tatajestwazny/app/src/AdminHandlers.php:    function handleSettingsPost($action)
+
+## 🧠 Zależności w includes/
+require __DIR__ . '/../../src/bootstrap.php';
+require_once __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/load_env.php';
+    require_post_csrf();
+
+## ⚠️ Ostatnie błędy PHP (z kontenera)

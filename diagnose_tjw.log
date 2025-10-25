@@ -1,0 +1,293 @@
+🔍 Diagnoza aplikacji TataJestWazny
+📅 Data: czw, 23 paź 2025, 17:05:26 CEST
+----------------------------------------
+
+📂 Struktura katalogów:
+/var/www/tatajestwazny
+├── app
+│   ├── add_auth_include.sh
+│   ├── config
+│   │   ├── config.php
+│   │   ├── nginx
+│   │   └── nginx.conf
+│   ├── cookies.txt
+│   ├── db
+│   │   ├── init.sql
+│   │   └── tjw.sqlite
+│   ├── debug_password_hash.sh
+│   ├── deploy_admin_integration.sh
+│   ├── deploy_admin_panel.sh
+│   ├── deploy_admin_password_reset.sh
+│   ├── deploy_auth_and_blog_security.sh
+│   ├── deploy_auth_module.sh
+│   ├── deploy_blog_admin.sh
+│   ├── deploy_blog_module.sh
+│   ├── deploy_layout_module.sh
+│   ├── deploy_menu_module.sh
+│   ├── deploy_pages_module.sh
+│   ├── diagnose_admin_integrity.sh
+│   ├── diagnose_admin_php.sh
+│   ├── diagnose_tjw.sh
+│   ├── fix_admin_blog_layout.sh
+│   ├── fix_auth_php.sh
+│   ├── fix_require_once.sh
+│   ├── fix_requires.sh
+│   ├── full_auth_debug.sh
+│   ├── includes
+│   │   ├── auth.php
+│   │   ├── footer.php
+│   │   ├── header.php
+│   │   ├── layout.php
+│   │   └── load_env.php
+│   ├── init_tjw.sh
+│   ├── public
+│   │   ├── admin
+│   │   ├── apply_marzena_copy.sh
+│   │   ├── auth.php
+│   │   ├── deploy_tjw.sh
+│   │   ├── icons
+│   │   ├── includes
+│   │   ├── index.php
+│   │   ├── main.js
+│   │   ├── manifest.webmanifest
+│   │   ├── offline.php
+│   │   ├── sections
+│   │   ├── style.css
+│   │   ├── styles.css
+│   │   └── sw.js
+│   ├── README.md
+│   ├── reset_admin_password.sh
+│   ├── setup_tjw.sh
+│   ├── src
+│   │   ├── Blocks.php
+│   │   ├── bootstrap.php
+│   │   ├── Db.php
+│   │   ├── helpers.php
+│   │   └── Repositories
+│   ├── templates
+│   │   ├── 404.php
+│   │   ├── admin_block_form.php
+│   │   ├── admin_blocks_list.php
+│   │   ├── admin_dashboard.php
+│   │   ├── admin_layout.php
+│   │   ├── admin_menu_form.php
+│   │   ├── admin_menu_list.php
+│   │   ├── admin_pages_form.php
+│   │   ├── admin_pages_list.php
+│   │   ├── admin_posts_form.php
+│   │   ├── admin_posts_list.php
+│   │   ├── admin_settings.php
+│   │   ├── blog_list.php
+│   │   ├── blog_post.php
+│   │   ├── home.php
+│   │   ├── layout.php
+│   │   └── page.php
+│   ├── test_admin_panel.sh
+│   ├── test_auth_env.sh
+│   └── test_cookies.txt
+├── diagnose_tjw.log
+├── diagnose_tjw.sh
+├── docker-compose.yml
+├── nginx.conf
+└── public
+    └── index.php
+
+15 directories, 73 files
+
+📦 Pliki kluczowe:
+/var/www/tatajestwazny/public/index.php
+/var/www/tatajestwazny/app/templates/layout.php
+/var/www/tatajestwazny/app/templates/404.php
+/var/www/tatajestwazny/app/templates/admin_dashboard.php
+/var/www/tatajestwazny/app/templates/admin_pages_form.php
+/var/www/tatajestwazny/app/templates/blog_list.php
+/var/www/tatajestwazny/app/templates/admin_settings.php
+/var/www/tatajestwazny/app/templates/page.php
+/var/www/tatajestwazny/app/templates/admin_pages_list.php
+/var/www/tatajestwazny/app/templates/admin_menu_form.php
+/var/www/tatajestwazny/app/templates/admin_block_form.php
+/var/www/tatajestwazny/app/templates/admin_posts_list.php
+/var/www/tatajestwazny/app/templates/admin_menu_list.php
+/var/www/tatajestwazny/app/templates/admin_blocks_list.php
+/var/www/tatajestwazny/app/templates/admin_posts_form.php
+/var/www/tatajestwazny/app/templates/admin_layout.php
+/var/www/tatajestwazny/app/templates/home.php
+/var/www/tatajestwazny/app/templates/blog_post.php
+/var/www/tatajestwazny/app/includes/layout.php
+/var/www/tatajestwazny/app/includes/header.php
+/var/www/tatajestwazny/app/includes/load_env.php
+/var/www/tatajestwazny/app/includes/auth.php
+/var/www/tatajestwazny/app/includes/footer.php
+/var/www/tatajestwazny/app/public/offline.php
+/var/www/tatajestwazny/app/public/index.php
+/var/www/tatajestwazny/app/public/auth.php
+/var/www/tatajestwazny/app/config/nginx.conf
+/var/www/tatajestwazny/app/config/config.php
+/var/www/tatajestwazny/app/src/bootstrap.php
+/var/www/tatajestwazny/app/src/Db.php
+/var/www/tatajestwazny/app/src/Blocks.php
+/var/www/tatajestwazny/app/src/helpers.php
+/var/www/tatajestwazny/nginx.conf
+/var/www/tatajestwazny/docker-compose.yml
+
+🗄️  Baza danych SQLite:
+-rwxrwxr-x 1 www-data www-data 53248 10-23 15:22 /var/www/tatajestwazny/app/db/tjw.sqlite
+  Plik: /var/www/tatajestwazny/app/db/tjw.sqlite
+  rozmiar: 53248     	bloków: 104        bloki I/O: 4096   plik zwykły
+Urządzenie: 8,53	inody: 592         dowiązań: 1
+Dostęp: (0775/-rwxrwxr-x)  Uid: (   33/www-data)   Gid: (   33/www-data)
+Dostęp:      2025-10-23 16:33:02.563744700 +0200
+Modyfikacja: 2025-10-23 15:22:50.491418145 +0200
+Zmiana:      2025-10-23 16:53:15.992623739 +0200
+Utworzenie:  2025-10-23 15:22:50.487418125 +0200
+
+🔐 Uprawnienia katalogu db:
+drwxrwxr-x 2 www-data www-data 4096 10-23 15:22 /var/www/tatajestwazny/app/db
+
+🐳 Kontenery Dockera:
+tjw_nginx                Up 32 minutes         80/tcp
+tjw_php                  Up 32 minutes         9000/tcp
+
+⚙️  Szczegóły sieci:
+f6e5aa2cf7c7   tatajestwazny_tjw_net         bridge    local
+6de1e3962a5c   tjw_net                       bridge    local
+
+📡 Inspekcja traefik_net:
+{
+  "0d25186323b207d16553a0018902442e04532b9b4c79e0aaf0864b694d442cfa": {
+    "Name": "webmajster-portal-1",
+    "EndpointID": "13c4e1a92a891aa8bbdabae68034006210c0e6bbd7d2822ea215bfac0afd3731",
+    "MacAddress": "ce:91:a7:7a:8c:ef",
+    "IPv4Address": "172.19.0.6/16",
+    "IPv6Address": ""
+  },
+  "32172c22a1ac510003bc78ad7ffe28c368c6fdd28eee87e62cc94da4dc1fc651": {
+    "Name": "webmajster-generator-1",
+    "EndpointID": "7656fdce6bcdabce743f3fd0bed045bc5897d020398be561588d032df54ceaf2",
+    "MacAddress": "32:ef:f8:4b:c3:74",
+    "IPv4Address": "172.19.0.2/16",
+    "IPv6Address": ""
+  },
+  "76d954ced46b4e0cf94e174ca9eae7ac66a198f20d9be00c1390140fb2b71636": {
+    "Name": "lab_php",
+    "EndpointID": "5dc678c9c78d4b084f5f139104051b05c52698204bdf4b4a1cb4b2e7fb439af3",
+    "MacAddress": "be:b6:81:2a:c9:ad",
+    "IPv4Address": "172.19.0.7/16",
+    "IPv6Address": ""
+  },
+  "8be1a22ffc8917732f606e3742c6cc24148a49c5a1099d8e3d6c2047710a2d2a": {
+    "Name": "lab_nginx",
+    "EndpointID": "ea2f48f367589ab5a415c0ef418e7e5dc48e19e24cda6921bcae0774dcdbc01f",
+    "MacAddress": "7a:56:f7:58:60:fe",
+    "IPv4Address": "172.19.0.3/16",
+    "IPv6Address": ""
+  },
+  "925902cec96666d744ebd143bb4c4cd19d76a760c5fe3c6657c077d04f588e4c": {
+    "Name": "traefik",
+    "EndpointID": "c6c6500e18993eb7f50a83c3e1cf927442710f7780f98453bb405319c5c9f02b",
+    "MacAddress": "42:ba:6b:59:fb:d1",
+    "IPv4Address": "172.19.0.9/16",
+    "IPv6Address": ""
+  },
+  "ac1a05194609a4f559f4d2570a3eb854c3b089826c5ce015b80438cc5cbacfc3": {
+    "Name": "tjw_nginx",
+    "EndpointID": "54a1c3e4e596074919701f61b5c184bd104cb6524fc155c012e026dc5703cef3",
+    "MacAddress": "6e:6f:8b:f1:22:4d",
+    "IPv4Address": "172.19.0.8/16",
+    "IPv6Address": ""
+  },
+  "bdc0c63b382544a3ab772a19e2bd107fcc64b30e78ec7997ff006c0b9d561e74": {
+    "Name": "tjw_php",
+    "EndpointID": "aaa16de074d63a888cefa22dcb5334b0eba7320b744f76a3611e5d06077f536a",
+    "MacAddress": "86:ef:86:7c:5a:ab",
+    "IPv4Address": "172.19.0.4/16",
+    "IPv6Address": ""
+  },
+  "be60dbcf7a2d881d501474889d1eb5b3502cd0c6b7511a3e87f08f146cddaff4": {
+    "Name": "webmajster-agent-1",
+    "EndpointID": "db9545e449eaf843bbb771f0f82c0fecfce5d22010a2465d65c6acc7f2a76ab1",
+    "MacAddress": "e6:db:47:3b:70:31",
+    "IPv4Address": "172.19.0.5/16",
+    "IPv6Address": ""
+  }
+}
+
+📜 Logi kontenerów:
+
+🧩 Nginx:
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+10-listen-on-ipv6-by-default.sh: info: can not modify /etc/nginx/conf.d/default.conf (read-only file system?)
+/docker-entrypoint.sh: Sourcing /docker-entrypoint.d/15-local-resolvers.envsh
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
+/docker-entrypoint.sh: Configuration complete; ready for start up
+2025/10/23 14:32:51 [notice] 1#1: using the "epoll" event method
+2025/10/23 14:32:51 [notice] 1#1: nginx/1.28.0
+2025/10/23 14:32:51 [notice] 1#1: built by gcc 12.2.0 (Debian 12.2.0-14) 
+2025/10/23 14:32:51 [notice] 1#1: OS: Linux 6.1.0-37-amd64
+2025/10/23 14:32:51 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+2025/10/23 14:32:51 [notice] 1#1: start worker processes
+2025/10/23 14:32:51 [notice] 1#1: start worker process 21
+2025/10/23 14:32:51 [notice] 1#1: start worker process 22
+2025/10/23 14:32:51 [notice] 1#1: start worker process 23
+2025/10/23 14:32:51 [notice] 1#1: start worker process 24
+2025/10/23 14:32:51 [notice] 1#1: start worker process 25
+2025/10/23 14:32:51 [notice] 1#1: start worker process 26
+2025/10/23 14:32:51 [notice] 1#1: start worker process 27
+2025/10/23 14:32:51 [notice] 1#1: start worker process 28
+
+🧠 PHP-FPM:
+172.21.0.3 -  23/Oct/2025:14:33:00 +0000 "HEAD /index.php" 200
+172.21.0.3 -  23/Oct/2025:14:33:02 +0000 "HEAD /index.php" 200
+172.21.0.3 -  23/Oct/2025:14:33:05 +0000 "GET /index.php" 200
+172.21.0.3 -  23/Oct/2025:14:33:15 +0000 "GET /index.php" 200
+172.21.0.3 -  23/Oct/2025:14:35:52 +0000 "HEAD /index.php" 200
+172.21.0.3 -  23/Oct/2025:14:39:45 +0000 "GET /index.php" 200
+172.21.0.3 -  23/Oct/2025:14:39:49 +0000 "GET /index.php" 200
+172.21.0.3 -  23/Oct/2025:14:40:55 +0000 "HEAD /index.php" 200
+172.21.0.3 -  23/Oct/2025:14:45:59 +0000 "HEAD /index.php" 200
+172.21.0.3 -  23/Oct/2025:14:51:02 +0000 "HEAD /index.php" 200
+172.21.0.3 -  23/Oct/2025:14:56:06 +0000 "HEAD /index.php" 200
+172.21.0.3 -  23/Oct/2025:14:57:55 +0000 "GET /index.php" 200
+172.21.0.3 -  23/Oct/2025:15:01:09 +0000 "HEAD /index.php" 200
+172.21.0.3 -  23/Oct/2025:15:02:43 +0000 "GET /index.php" 200
+172.21.0.3 -  23/Oct/2025:15:03:23 +0000 "GET /index.php" 200
+172.21.0.3 -  23/Oct/2025:15:04:29 +0000 "GET /index.php" 200
+172.21.0.3 -  23/Oct/2025:15:04:47 +0000 "GET /index.php" 200
+172.21.0.3 -  23/Oct/2025:15:04:47 +0000 "GET /index.php" 200
+172.21.0.3 -  23/Oct/2025:15:04:47 +0000 "GET /index.php" 200
+172.21.0.3 -  23/Oct/2025:15:04:59 +0000 "GET /index.php" 200
+
+🔍 Uprawnienia katalogów projektu:
+drwxr-xr-x 4 roman roman 4096 10-23 17:05 /var/www/tatajestwazny
+drwxr-xr-x 2 roman roman 4096 10-23 12:08 /var/www/tatajestwazny/public
+drwxr-xr-x 9 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app
+drwxr-xr-x 2 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/templates
+drwxr-xr-x 2 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/includes
+drwxr-xr-x 7 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/public
+drwxr-xr-x 3 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/public/.backup
+drwxr-xr-x 2 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/public/admin
+drwxr-xr-x 2 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/public/includes
+drwxr-xr-x 2 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/public/sections
+drwxr-xr-x 2 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/public/icons
+drwxr-xr-x 8 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/.git
+drwxr-xr-x 2 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/.git/info
+drwxr-xr-x 2 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/.git/branches
+drwxr-xr-x 5 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/.git/refs
+drwxr-xr-x 2 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/.git/hooks
+drwxr-xr-x 4 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/.git/objects
+drwxr-xr-x 3 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/.git/logs
+drwxr-xr-x 3 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/config
+drwxr-xr-x 2 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/config/nginx
+drwxr-xr-x 3 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/src
+drwxr-xr-x 2 roman roman 4096 10-23 15:22 /var/www/tatajestwazny/app/src/Repositories
+drwxrwxr-x 2 www-data www-data 4096 10-23 15:22 /var/www/tatajestwazny/app/db
+
+💡 Test PHP info:
+PHP 8.3.26 (cli) (built: Oct  8 2025 22:48:31) (NTS)
+Copyright (c) The PHP Group
+Zend Engine v4.3.26, Copyright (c) Zend Technologies
+    with Zend OPcache v8.3.26, Copyright (c), by Zend Technologies
+
+🧠 Automatyczna analiza:
+✅ Uprawnienia bazy danych są prawidłowe (www-data:775).
