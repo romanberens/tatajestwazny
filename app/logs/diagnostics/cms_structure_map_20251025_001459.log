@@ -1,0 +1,89 @@
+[00:14:59] === 📋 CMS STRUCTURE MAP TEST START ===
+[00:14:59] Base dir: /var/www/html/app
+[00:14:59] Znaleziono 54 plików PHP
+[00:14:59] FUNC [layout] (string $title, string $bodyHtml) in /includes/layout.php
+[00:14:59] FUNC [ensure_secure_session] () in /includes/auth.php
+[00:14:59] FUNC [force_regenerate_session] () in /includes/auth.php
+[00:14:59] FUNC [logout] () in /includes/auth.php
+[00:14:59] FUNC [auth] () in /includes/auth.php
+[00:14:59] FUNC [getCurrentPasswordHash] () in /includes/auth.php
+[00:14:59] FUNC [layout] (string $title, string $bodyHtml) in /public/includes/layout.php
+[00:14:59] FUNC [logLine] (string $msg) in /tests/test_structure_map.php
+[00:14:59] FUNC [__construct] (private PDO $pdo) in /src/Repositories/MenuRepository.php
+[00:14:59] FUNC [all] () in /src/Repositories/MenuRepository.php
+[00:14:59] FUNC [visible] () in /src/Repositories/MenuRepository.php
+[00:14:59] FUNC [find] (int $id) in /src/Repositories/MenuRepository.php
+[00:14:59] FUNC [save] (array $payload) in /src/Repositories/MenuRepository.php
+[00:14:59] FUNC [delete] (int $id) in /src/Repositories/MenuRepository.php
+[00:14:59] CLASS [MenuRepository] in /src/Repositories/MenuRepository.php
+[00:14:59]  ↳ METHOD all() : array
+[00:14:59]  ↳ METHOD visible() : array
+[00:14:59]  ↳ METHOD find($id:int) : ?array
+[00:14:59]  ↳ METHOD save($payload:array) : int
+[00:14:59]  ↳ METHOD delete($id:int) : void
+[00:14:59] FUNC [__construct] (private PDO $pdo) in /src/Repositories/PostsRepository.php
+[00:14:59] FUNC [all] () in /src/Repositories/PostsRepository.php
+[00:14:59] FUNC [published] () in /src/Repositories/PostsRepository.php
+[00:14:59] FUNC [find] (int $id) in /src/Repositories/PostsRepository.php
+[00:14:59] FUNC [findBySlug] (string $slug) in /src/Repositories/PostsRepository.php
+[00:14:59] FUNC [save] (array $payload) in /src/Repositories/PostsRepository.php
+[00:14:59] FUNC [delete] (int $id) in /src/Repositories/PostsRepository.php
+[00:14:59] CLASS [PostsRepository] in /src/Repositories/PostsRepository.php
+[00:14:59]  ↳ METHOD all() : array
+[00:14:59]  ↳ METHOD published() : array
+[00:14:59]  ↳ METHOD find($id:int) : ?array
+[00:14:59]  ↳ METHOD findBySlug($slug:string) : ?array
+[00:14:59]  ↳ METHOD save($payload:array) : int
+[00:14:59]  ↳ METHOD delete($id:int) : void
+[00:14:59] FUNC [__construct] (private PDO $pdo) in /src/Repositories/PagesRepository.php
+[00:14:59] FUNC [all] () in /src/Repositories/PagesRepository.php
+[00:14:59] FUNC [find] (int $id) in /src/Repositories/PagesRepository.php
+[00:14:59] FUNC [findBySlug] (string $slug) in /src/Repositories/PagesRepository.php
+[00:14:59] FUNC [save] (array $payload) in /src/Repositories/PagesRepository.php
+[00:14:59] FUNC [delete] (int $id) in /src/Repositories/PagesRepository.php
+[00:14:59] CLASS [PagesRepository] in /src/Repositories/PagesRepository.php
+[00:14:59]  ↳ METHOD all() : array
+[00:14:59]  ↳ METHOD find($id:int) : ?array
+[00:14:59]  ↳ METHOD findBySlug($slug:string) : ?array
+[00:14:59]  ↳ METHOD save($payload:array) : int
+[00:14:59]  ↳ METHOD delete($id:int) : void
+[00:14:59] FUNC [gatherStats] ($blocksRepository, $pagesRepository, $menuRepository, $postsRepository) in /src/Stats.php
+[00:14:59] FUNC [handleBlocksPost] ($action, $blocksRepository = null) in /src/AdminHandlers.php
+[00:14:59] FUNC [handlePagesPost] ($action, $pagesRepository = null) in /src/AdminHandlers.php
+[00:14:59] FUNC [handleMenuPost] ($action, $menuRepository = null) in /src/AdminHandlers.php
+[00:14:59] FUNC [handleBlogPost] ($action, $postsRepository = null) in /src/AdminHandlers.php
+[00:14:59] FUNC [handleSettingsPost] ($action) in /src/AdminHandlers.php
+[00:14:59] FUNC [__construct] () in /src/Db.php
+[00:14:59] CLASS [Db] in /src/Db.php
+[00:14:59] FUNC [__construct] (private PDO $pdo) in /src/Blocks.php
+[00:14:59] FUNC [byRegion] (string $region) in /src/Blocks.php
+[00:14:59] FUNC [all] () in /src/Blocks.php
+[00:14:59] FUNC [find] (int $id) in /src/Blocks.php
+[00:14:59] FUNC [save] (array $d) in /src/Blocks.php
+[00:14:59] FUNC [delete] (int $id) in /src/Blocks.php
+[00:14:59] FUNC [move] (int $id, int $delta) in /src/Blocks.php
+[00:14:59] CLASS [Blocks] in /src/Blocks.php
+[00:14:59]  ↳ METHOD byRegion($region:string) : array
+[00:14:59]  ↳ METHOD all() : array
+[00:14:59]  ↳ METHOD find($id:int) : ?array
+[00:14:59]  ↳ METHOD save($d:array) : int
+[00:14:59]  ↳ METHOD delete($id:int) : void
+[00:14:59]  ↳ METHOD move($id:int, $delta:int) : void
+[00:14:59] FUNC [safe_html] (?string $html) in /src/helpers.php
+[00:14:59] FUNC [render] (string $template, array $vars = [], string $layout = 'layout.php') in /src/helpers.php
+[00:14:59] FUNC [render_admin] (string $template, array $vars = []) in /src/helpers.php
+[00:14:59] FUNC [redirect] (string $url) in /src/helpers.php
+[00:14:59] FUNC [require_post_csrf] () in /src/helpers.php
+[00:14:59] POST reference in /public/admin/index.php
+[00:14:59] CSRF check in /public/admin/index.php
+[00:14:59] POST reference in /public/admin/auth.php
+[00:14:59] CSRF check in /public/admin/auth.php
+[00:14:59] POST reference in /analyze_auth.php
+[00:14:59] POST reference in /tests/test_post_capture.php
+[00:14:59] POST reference in /tests/test_structure_map.php
+[00:14:59] CSRF check in /tests/test_structure_map.php
+[00:14:59] POST reference in /src/AdminHandlers.php
+[00:14:59] CSRF check in /src/AdminHandlers.php
+[00:14:59] POST reference in /src/helpers.php
+[00:14:59] CSRF check in /src/helpers.php
+[00:14:59] === ✅ CMS STRUCTURE MAP TEST END ===

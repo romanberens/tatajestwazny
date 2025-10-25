@@ -1,0 +1,12 @@
+🧪 Runtime weryfikacja logowania admina
+📅 Thu Oct 23 16:40:44 UTC 2025
+----------------------------------------
+\n📂 Pliki:
+✅ /var/www/html/app/includes/load_env.php
+✅ /var/www/html/app/public/admin/auth.php
+✅ /var/www/html/app/.env
+\n🧩 Odczyt AUTH_PASSWORD_HASH z runtime (po require load_env.php):
+HASH=$2y$10$Sgbzq7PP/3K1K/V8DJTdwO4/r72tnwTrDVJtG0S6DrddRPMmodbea
+\n🔐 Walidacja bcrypt + password_verify:
+Format bcrypt: NIE
+password_verify: OK

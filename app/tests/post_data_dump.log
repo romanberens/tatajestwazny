@@ -1,0 +1,8 @@
+Array
+(
+    [csrf] => testtoken
+    [action] => save_page
+    [slug] => nowa-strona
+    [title] => Nowa strona testowa
+    [body_html] => <p>Nowa treść testowa</p>
+)

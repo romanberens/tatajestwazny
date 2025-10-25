@@ -1,0 +1,26 @@
+[2025-10-24 22:33:08] === 🔍 START SECURITY AUDIT ===
+[2025-10-24 22:33:08] [SECURITY] AdminHandlers.php ✅ zawiera require_post_csrf()
+[2025-10-24 22:33:08] [SECURITY] helpers.php ✅ zawiera funkcję safe_html()
+[2025-10-24 22:33:08] [SECURITY] helpers.php ✅ używa htmlspecialchars()
+[2025-10-24 22:33:08] [SECURITY] MenuRepository.php ✅ używa trim() do czyszczenia danych
+[2025-10-24 22:33:08] [SECURITY] MenuRepository.php ✅ sprawdza empty() (walidacja wymaganych pól)
+[2025-10-24 22:33:08] [SECURITY] PagesRepository.php ✅ używa trim() do czyszczenia danych
+[2025-10-24 22:33:08] [SECURITY] PagesRepository.php ✅ sprawdza empty() (walidacja wymaganych pól)
+[2025-10-24 22:33:08] [SECURITY] PostsRepository.php ✅ używa trim() do czyszczenia danych
+[2025-10-24 22:33:08] [SECURITY] PostsRepository.php ✅ sprawdza empty() (walidacja wymaganych pól)
+[2025-10-24 22:33:08] [SECURITY] admin_block_form.php ✅ ma pole hidden csrf
+[2025-10-24 22:33:08] [SECURITY] admin_blocks_list.php ✅ ma pole hidden csrf
+[2025-10-24 22:33:08] [SECURITY] admin_dashboard.php ⚠️ brak pola csrf
+[2025-10-24 22:33:08] [SECURITY] admin_layout.php ⚠️ brak pola csrf
+[2025-10-24 22:33:09] [SECURITY] admin_menu_form.php ✅ ma pole hidden csrf
+[2025-10-24 22:33:09] [SECURITY] admin_menu_list.php ✅ ma pole hidden csrf
+[2025-10-24 22:33:09] [SECURITY] admin_pages_form.php ✅ ma pole hidden csrf
+[2025-10-24 22:33:09] [SECURITY] admin_pages_list.php ✅ ma pole hidden csrf
+[2025-10-24 22:33:09] [SECURITY] admin_posts_form.php ✅ ma pole hidden csrf
+[2025-10-24 22:33:09] [SECURITY] admin_posts_list.php ✅ ma pole hidden csrf
+[2025-10-24 22:33:09] [SECURITY] admin_settings.php ✅ ma pole hidden csrf
+[2025-10-24 22:33:09] [SECURITY] AdminHandlers.php ⚠️ bezpośredni dostęp do $_POST (brak filtracji)
+[2025-10-24 22:33:09] [SECURITY] helpers.php ⚠️ bezpośredni dostęp do $_POST (brak filtracji)
+[2025-10-24 22:33:09] [SECURITY] index.php ⚠️ bezpośredni dostęp do $_POST (brak filtracji)
+[2025-10-24 22:33:09] [SECURITY] auth.php ⚠️ bezpośredni dostęp do $_POST (brak filtracji)
+[2025-10-24 22:33:09] === ✅ END SECURITY AUDIT ===

@@ -1,0 +1,62 @@
+[2025-10-24 23:19:19] === 🔍 START EXTENDED SECURITY AUDIT ===
+[2025-10-24 23:19:19] [CHECK] XSS: echo $_POST / $_GET / $_REQUEST
+------------------------------------------------------------
+------------------------------------------------------------
+[2025-10-24 23:19:20] [CHECK] Echo zmiennych bez htmlspecialchars
+------------------------------------------------------------
+/var/www/html/app/analyze_auth.php:18:echo "🔎 Analiza mechanizmu autoryzacji w $root\n\n";
+/var/www/html/app/analyze_auth.php:41:    echo " - $file (" . implode(", ", array_unique($matches)) . ")\n";
+/var/www/html/app/analyze_auth.php:47:    echo "\n⚙️  Wykryto plik konfiguracyjny: $configFile\n";
+/var/www/html/app/analyze_auth.php:51:        echo "   {$m[1]}\n";
+/var/www/html/app/analyze_auth.php:54:        echo "\n   Następnie wklej wynik do $configFile w miejsce dotychczasowego hasha.\n";
+/var/www/html/app/analyze_auth.php:73:            echo "   Tabele: " . implode(", ", $tables) . "\n";
+/var/www/html/app/analyze_auth.php:78:                    echo "     - {$c['name']} ({$c['type']})\n";
+/var/www/html/app/analyze_auth.php:85:        echo "❌ Błąd połączenia z SQLite: " . $e->getMessage() . "\n";
+/var/www/html/app/analyze_auth.php:88:    echo "\n⚠️  Brak pliku bazy danych: $dbFile\n";
+/var/www/html/app/tests/test_runtime_trace.php:83:echo "✅ Raport zapisano do: $logFile\n";
+/var/www/html/app/tests/test_db_structure.php:13:    echo "  - $t\n";
+/var/www/html/app/tests/test_db_structure.php:20:    echo "❌ Brakuje tabel: " . implode(', ', $missing) . "\n";
+/var/www/html/app/tests/test_structure_map.php:102:echo "✅ Raport zapisano do: $logFile\n";
+/var/www/html/app/tests/test_db_integrity.php:10:    echo "❌ Brak pliku bazy danych: $dbFile\n";
+/var/www/html/app/tests/test_db_integrity.php:23:    echo "PRAGMA integrity_check: $check\n";
+/var/www/html/app/tests/test_db_integrity.php:33:            echo "✅ $table — posiada klucze obce (" . count($fks) . ")\n";
+/var/www/html/app/tests/test_db_integrity.php:35:            echo "⚠️ $table — brak kluczy obcych\n";
+/var/www/html/app/tests/test_db_integrity.php:44:            echo "⚠️ $table — duplikaty w kolumnie $col: " . count($dup) . "\n";
+/var/www/html/app/tests/test_db_integrity.php:46:            echo "✅ $table — brak duplikatów\n";
+/var/www/html/app/tests/test_db_integrity.php:52:    echo "❌ Błąd: " . $e->getMessage() . "\n";
+/var/www/html/app/tests/test_repositories.php:20:    echo "✅ PagesRepository::save() OK, ID=$id\n";
+/var/www/html/app/tests/test_repositories.php:22:    echo "❌ PagesRepository::save() ERROR: " . $e->getMessage() . "\n";
+/var/www/html/app/tests/test_repositories.php:34:    echo "✅ PostsRepository::save() OK, ID=$id\n";
+/var/www/html/app/tests/test_repositories.php:36:    echo "❌ PostsRepository::save() ERROR: " . $e->getMessage() . "\n";
+/var/www/html/app/tests/test_repositories.php:49:    echo "✅ MenuRepository::save() OK, ID=$id\n";
+/var/www/html/app/tests/test_repositories.php:51:    echo "❌ MenuRepository::save() ERROR: " . $e->getMessage() . "\n";
+/var/www/html/app/src/helpers.php:110:      echo "<!-- template not found: $template -->";
+/var/www/html/app/src/helpers.php:116:      echo "<!-- layout not found: $layout -->";
+/var/www/html/app/src/helpers.php:132:    echo "<!-- render loaded template=$template -->";
+/var/www/html/app/src/helpers.php:143:    echo "<pre>Render error: ".htmlspecialchars($e->getMessage())."</pre>";
+------------------------------------------------------------
+[2025-10-24 23:19:20] [CHECK] SQLi: prepare(...) z interpolacją zmiennych
+------------------------------------------------------------
+------------------------------------------------------------
+[2025-10-24 23:19:20] [CHECK] PDO execute() — brak placeholderów '?'
+------------------------------------------------------------
+------------------------------------------------------------
+[2025-10-24 23:19:20] [CHECK] Hardcoded 'password' (bez password_hash)
+------------------------------------------------------------
+------------------------------------------------------------
+[2025-10-24 23:19:21] [CHECK] AUTH_PASSWORD / AUTH_PASSWORD_HASH
+------------------------------------------------------------
+/var/www/html/app/includes/auth.php:109:    if (!empty($_ENV['AUTH_PASSWORD_HASH'])) {
+/var/www/html/app/includes/auth.php:110:        return $_ENV['AUTH_PASSWORD_HASH'];
+/var/www/html/app/includes/auth.php:118:            if (strpos(trim($line), 'AUTH_PASSWORD_HASH=') === 0) {
+/var/www/html/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/html/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/html/app/src/AdminHandlers.php:115:                if (strpos(trim($line), 'AUTH_PASSWORD_HASH=') === 0) {
+/var/www/html/app/src/AdminHandlers.php:116:                    $newLines[] = 'AUTH_PASSWORD_HASH="' . $newHash . '"';
+/var/www/html/app/src/AdminHandlers.php:125:            $newLines[] = 'AUTH_PASSWORD_HASH="' . $newHash . '"';
+------------------------------------------------------------
+[2025-10-24 23:19:21] [CHECK] Echo $_SERVER — możliwe ujawnienie danych
+------------------------------------------------------------
+------------------------------------------------------------
+[2025-10-24 23:19:21] === ✅ END EXTENDED SECURITY AUDIT ===
+[2025-10-24 23:19:21] 📜 Raport zapisano do: /var/www/html/app/logs/diagnostics/cms_security_extended_20251024_231919.log

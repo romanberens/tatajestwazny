@@ -1,0 +1,1022 @@
+🔍 Analiza autoryzacji (Tata Jest Ważny)
+📅 Data: czw, 23 paź 2025, 17:57:56 CEST
+----------------------------------------
+
+📂 Pliki logowania (auth.php, login.php itp.):
+/var/www/tatajestwazny/app/includes/auth.php
+/var/www/tatajestwazny/app/public/admin/auth.php
+/var/www/tatajestwazny/app/public/auth.php
+/var/www/tatajestwazny/app/analyze_auth.php
+
+🧩 Wykrywanie funkcji i zmiennych powiązanych z hasłem:
+/var/www/tatajestwazny/app/templates/admin_settings.php:11:      <input type="hidden" name="action" value="update_password">
+/var/www/tatajestwazny/app/templates/admin_settings.php:14:        <input type="password" name="old_password" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-slate-100 focus:border-orange-400" required>
+/var/www/tatajestwazny/app/templates/admin_settings.php:19:          <input type="password" name="new_password" minlength="8" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-slate-100 focus:border-orange-400" required>
+/var/www/tatajestwazny/app/templates/admin_settings.php:22:          <input type="password" name="repeat_password" minlength="8" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-slate-100 focus:border-orange-400" required>
+/var/www/tatajestwazny/app/templates/admin_layout.php:35:      <p class="mt-2"><a href="/admin/auth.php?action=logout" class="text-orange-400 hover:text-orange-300">Wyloguj się</a></p>
+/var/www/tatajestwazny/app/templates/admin_layout.php:46:        <a href="/admin/auth.php?action=logout" class="text-sm text-orange-400">Wyloguj</a>
+/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/includes/auth.php:77:function auth(): void
+/var/www/tatajestwazny/app/includes/auth.php:82:        header('Location: /admin/auth.php');
+/var/www/tatajestwazny/app/public/admin/index.php:3:require_once __DIR__ . '/../../includes/auth.php';
+/var/www/tatajestwazny/app/public/admin/index.php:7:auth();
+/var/www/tatajestwazny/app/public/admin/index.php:191:            'currentHash' => getCurrentPasswordHash(),
+/var/www/tatajestwazny/app/public/admin/auth.php:2:require_once __DIR__ . '/../../includes/auth.php';
+/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/public/admin/auth.php:13:if (!$hash) {
+/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/public/admin/auth.php:21:    header('Location: /admin/auth.php');
+/var/www/tatajestwazny/app/public/admin/auth.php:25:$attemptState = $_SESSION['auth_attempts'] ?? ['count' => 0, 'locked_until' => 0];
+/var/www/tatajestwazny/app/public/admin/auth.php:30:    $_SESSION['auth_attempts'] = $attemptState;
+/var/www/tatajestwazny/app/public/admin/auth.php:43:    $password = $_POST['password'] ?? '';
+/var/www/tatajestwazny/app/public/admin/auth.php:44:    if (password_verify($password, $hash)) {
+/var/www/tatajestwazny/app/public/admin/auth.php:49:        unset($_SESSION['auth_attempts']);
+/var/www/tatajestwazny/app/public/admin/auth.php:61:    $_SESSION['auth_attempts'] = $attemptState;
+/var/www/tatajestwazny/app/public/admin/auth.php:95:        <input type="password" name="password" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 shadow-inner focus:border-orange-400 focus:ring-0" placeholder="••••••••" required>
+/var/www/tatajestwazny/app/public/deploy_tjw.sh:357:# 4) ADMIN (login + listing + edycja)
+/var/www/tatajestwazny/app/public/deploy_tjw.sh:360:cat > "$ADM/auth.php" <<'PHP'
+/var/www/tatajestwazny/app/public/deploy_tjw.sh:363:const ADMIN_PASS_HASH = '$2y$10$8m2m5wz3rtt8bqgZqO7W5O5m8e8s3S1m2u9mUQ3qgEoZqjZc5w0dW'; // hasło: changeme
+/var/www/tatajestwazny/app/public/deploy_tjw.sh:369:require __DIR__ . '/auth.php';
+/var/www/tatajestwazny/app/public/deploy_tjw.sh:372:  if (empty($_SESSION['admin'])) { header('Location: /admin/?action=login'); exit; }
+/var/www/tatajestwazny/app/public/deploy_tjw.sh:379:if ($action === 'login') {
+/var/www/tatajestwazny/app/public/deploy_tjw.sh:382:    if ($u === ADMIN_USER && password_verify($p, ADMIN_PASS_HASH)) {
+/var/www/tatajestwazny/app/public/deploy_tjw.sh:396:        <input type="password" class="border p-2 rounded w-full" name="pass" autocomplete="current-password">
+/var/www/tatajestwazny/app/public/deploy_tjw.sh:404:if ($action === 'logout') { unset($_SESSION['admin']); redirect('/admin/?action=login'); }
+/var/www/tatajestwazny/app/public/deploy_tjw.sh:528:echo "🔐 Panel: http://tatajestwazny.local/admin/  (login: admin / hasło: changeme)"
+/var/www/tatajestwazny/app/public/deploy_tjw.sh:529:echo "ℹ️ Zmień hasło edytując $ADM/auth.php (ADMIN_PASS_HASH)."
+/var/www/tatajestwazny/app/public/auth.php:3:header('Location: /admin/auth.php', true, 302);
+/var/www/tatajestwazny/app/test_auth_env.sh:3:echo "🔍 TEST AUTORYZACJI I ŚRODOWISKA (.env + password_verify + curl)"
+/var/www/tatajestwazny/app/test_auth_env.sh:10:  grep AUTH_PASSWORD_HASH .env || echo "❌ Brak AUTH_PASSWORD_HASH w .env"
+/var/www/tatajestwazny/app/test_auth_env.sh:13:echo -e "\n🔐 2. Testowanie password_verify w PHP..."
+/var/www/tatajestwazny/app/test_auth_env.sh:14:HASH=$(grep AUTH_PASSWORD_HASH .env | cut -d'=' -f2 | tr -d '"')
+/var/www/tatajestwazny/app/test_auth_env.sh:15:PHP_TEST=$(php -r "echo password_verify('Entropia.2025', '$HASH') ? '✅ OK' : '❌ BŁĄD';")
+/var/www/tatajestwazny/app/test_auth_env.sh:16:echo "Wynik password_verify(): $PHP_TEST"
+/var/www/tatajestwazny/app/test_auth_env.sh:18:echo -e "\n📄 3. Sprawdzanie kodu auth.php..."
+/var/www/tatajestwazny/app/test_auth_env.sh:19:if grep -q "password_verify" public/auth.php; then
+/var/www/tatajestwazny/app/test_auth_env.sh:20:  echo "✅ password_verify obecne w auth.php"
+/var/www/tatajestwazny/app/test_auth_env.sh:22:  echo "❌ Brak password_verify w auth.php"
+/var/www/tatajestwazny/app/test_auth_env.sh:28:  -d "password=Entropia.2025" | grep -q "Nieprawidłowe hasło" \
+/var/www/tatajestwazny/app/deploy_menu_module.sh:32:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/deploy_menu_module.sh:64:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/deploy_menu_module.sh:106:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/deploy_menu_module.sh:130:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/deploy_menu_module.sh:177:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/deploy_menu_module.sh:187:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:9:AUTH_FILE="$BASE_DIR/public/auth.php"
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:16:### 1. Generuj hash hasła, jeśli .env nie istnieje
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:19:  read -s PASSWORD
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:20:  HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:21:  echo "AUTH_PASSWORD_HASH='$HASH'" > "$ENV_FILE"
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:22:  echo "✅ Utworzono plik .env z hashem hasła"
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:27:### 2. auth.php
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:28:cat > "$AUTH_FILE" <<'PHP'
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:31:$hash = getenv('AUTH_PASSWORD_HASH') ?: (getenv('AUTH_PASSWORD_HASH') ?? '');
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:33:if (!$hash) {
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:34:  die('❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:39:    if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:50:  echo '<input type="password" name="password" placeholder="Hasło">';
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:57:echo "✅ Stworzono auth.php"
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:62:require_once '../auth.php';
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:119:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/diagnose_admin_integrity.sh:12:for path in "includes/auth.php" "public/admin/index.php" "public/admin/blog/index.php" "public/includes/layout.php" "db/tjw.sqlite"; do
+/var/www/tatajestwazny/app/diagnose_admin_integrity.sh:29:  "http://tatajestwazny.local/admin/login"
+/var/www/tatajestwazny/app/diagnose_admin_integrity.sh:46:echo "👀 Sprawdzam logikę auth:"
+/var/www/tatajestwazny/app/diagnose_admin_integrity.sh:48:grep -Ri --include="*.php" "require.*auth" . | cut -c 1-140
+/var/www/tatajestwazny/app/analyze_auth.php:9:    'password_verify',
+/var/www/tatajestwazny/app/analyze_auth.php:10:    'password_hash',
+/var/www/tatajestwazny/app/analyze_auth.php:12:    'admin_password',
+/var/www/tatajestwazny/app/analyze_auth.php:13:    'password',
+/var/www/tatajestwazny/app/analyze_auth.php:14:    'auth',
+/var/www/tatajestwazny/app/analyze_auth.php:15:    'verify'
+/var/www/tatajestwazny/app/analyze_auth.php:49:    if (preg_match('/admin_password[\'"]?\s*=>\s*[\'"](.+?)[\'"]/', $configContent, $m)) {
+/var/www/tatajestwazny/app/analyze_auth.php:50:        echo "✅ Hasło zapisane w konfiguracji jako hash bcrypt:\n";
+/var/www/tatajestwazny/app/analyze_auth.php:53:        echo "   docker exec -it tjw_php php -r 'echo password_hash(\"NOWE_HASLO\", PASSWORD_BCRYPT).\"\\n\";'\n";
+/var/www/tatajestwazny/app/analyze_auth.php:54:        echo "\n   Następnie wklej wynik do $configFile w miejsce dotychczasowego hasha.\n";
+/var/www/tatajestwazny/app/analyze_auth.php:56:        echo "⚠️  Plik config.php istnieje, ale nie znaleziono klucza 'admin_password'.\n";
+/var/www/tatajestwazny/app/analyze_auth.php:58:        echo "   return ['admin_password' => 'HASH_TUTAJ'];\n";
+/var/www/tatajestwazny/app/analyze_auth.php:62:    echo "   Możliwe, że hasło jest w bazie danych SQLite lub w include auth.php.\n";
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:6:LOG_FILE="$APP_PATH/auth_analysis.log"
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:13:echo -e "\n📂 Pliki logowania (auth.php, login.php itp.):" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:14:find "$APP_PATH" -type f -iname "*auth*.php" -o -iname "*login*.php" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:18:grep -Rin --color=never -E "password|PASSWORD|verify|hash|bcrypt|login|auth" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:23:  grep -E "password|pass" "$APP_PATH/config/config.php" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:33:  docker exec tjw_php sqlite3 /var/www/html/app/db/tjw.sqlite "SELECT name FROM sqlite_master WHERE sql LIKE '%password%';" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:40:grep -Rin "password_verify" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:41:grep -Rin "password_hash" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:43:# 6️⃣ Analiza includes/auth.php
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:44:AUTH_FILE="$APP_PATH/includes/auth.php"
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:45:if [ -f "$AUTH_FILE" ]; then
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:46:  echo -e "\n📜 Fragment pliku auth.php (pierwsze 40 linii):" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:47:  head -n 40 "$AUTH_FILE" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:49:  echo -e "\n⚠️ Brak pliku includes/auth.php" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/.git/hooks/pre-applypatch.sample:3:# An example hook script to verify what is about to be committed
+/var/www/tatajestwazny/app/.git/hooks/update.sample:63:zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
+/var/www/tatajestwazny/app/.git/hooks/pre-merge-commit.sample:3:# An example hook script to verify what is about to be committed.
+/var/www/tatajestwazny/app/.git/hooks/push-to-checkout.sample:67:	head=$(git hash-object -t tree --stdin </dev/null)
+/var/www/tatajestwazny/app/.git/hooks/pre-commit.sample:3:# An example hook script to verify what is about to be committed.
+/var/www/tatajestwazny/app/.git/hooks/pre-commit.sample:10:if git rev-parse --verify HEAD >/dev/null 2>&1
+/var/www/tatajestwazny/app/.git/hooks/pre-commit.sample:15:	against=$(git hash-object -t tree /dev/null)
+/var/www/tatajestwazny/app/.git/hooks/commit-msg.sample:15:# SOB=$(git var GIT_AUTHOR_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
+/var/www/tatajestwazny/app/.git/hooks/pre-push.sample:3:# An example hook script to verify what is about to be pushed.  Called by "git
+/var/www/tatajestwazny/app/.git/hooks/pre-push.sample:25:zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
+/var/www/tatajestwazny/app/.git/packed-refs:3:3e66ec6830d5fff8ef75df2b1fc94149f6b78409 refs/remotes/origin/codex/analyze-login-mechanism-and-create-reset-script
+/var/www/tatajestwazny/app/.git/packed-refs:8:714c43b41fe0ac1edec67abbf5047380c6da0b81 refs/remotes/origin/codex/replace-public/auth.php-with-redirect
+/var/www/tatajestwazny/app/deploy_auth_module.sh:5:read -sp "🔑 Podaj hasło do panelu administracyjnego: " PASSWORD
+/var/www/tatajestwazny/app/deploy_auth_module.sh:8:HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/deploy_auth_module.sh:9:echo "AUTH_PASSWORD_HASH=\"$HASH\"" > .env
+/var/www/tatajestwazny/app/deploy_auth_module.sh:10:echo "✅ Utworzono plik .env z hashem hasła"
+/var/www/tatajestwazny/app/deploy_auth_module.sh:29:# auth.php
+/var/www/tatajestwazny/app/deploy_auth_module.sh:30:cat > public/admin/auth.php <<EOF
+/var/www/tatajestwazny/app/deploy_auth_module.sh:35:\$storedHash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/deploy_auth_module.sh:39:    if (password_verify(\$_POST['password'], \$storedHash)) {
+/var/www/tatajestwazny/app/deploy_auth_module.sh:50:  echo '<input type="password" name="password" placeholder="Hasło">';
+/var/www/tatajestwazny/app/deploy_auth_module.sh:56:echo "✅ Stworzono auth.php"
+/var/www/tatajestwazny/app/deploy_auth_module.sh:61:require_once '../auth.php';
+/var/www/tatajestwazny/app/deploy_auth_module.sh:116:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/deploy_admin_panel.sh:17:auth();
+/var/www/tatajestwazny/app/deploy_admin_panel.sh:35:auth();
+/var/www/tatajestwazny/app/deploy_admin_panel.sh:61:auth();
+/var/www/tatajestwazny/app/deploy_admin_panel.sh:75:# csrf.php - zabezpieczenia + Basic Auth
+/var/www/tatajestwazny/app/deploy_admin_panel.sh:88:  if (!hash_equals($_SESSION['csrf'] ?? '', $token)) {
+/var/www/tatajestwazny/app/deploy_admin_panel.sh:93:function auth() {
+/var/www/tatajestwazny/app/deploy_admin_panel.sh:97:  if (!isset($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) ||
+/var/www/tatajestwazny/app/deploy_admin_panel.sh:98:      $_SERVER['PHP_AUTH_USER'] !== $USER ||
+/var/www/tatajestwazny/app/deploy_admin_panel.sh:99:      $_SERVER['PHP_AUTH_PW'] !== $PASS) {
+/var/www/tatajestwazny/app/deploy_admin_panel.sh:100:    header('WWW-Authenticate: Basic realm="Admin"');
+/var/www/tatajestwazny/app/deploy_admin_panel.sh:101:    header('HTTP/1.0 401 Unauthorized');
+/var/www/tatajestwazny/app/add_auth_include.sh:2:# Skrypt: Dodaje require_once '../auth.php'; na górze plików admin/blog
+/var/www/tatajestwazny/app/add_auth_include.sh:13:    if grep -q "require_once '../auth.php';" "$file"; then
+/var/www/tatajestwazny/app/add_auth_include.sh:14:      echo "✅ $file - już zawiera auth.php"
+/var/www/tatajestwazny/app/add_auth_include.sh:18:        sed -i "0,/<?php/ s/<?php/<?php\nrequire_once '..\/auth.php';/" "$file"
+/var/www/tatajestwazny/app/full_auth_debug.sh:7:PASSWORD="MuremZaOjcami.1"
+/var/www/tatajestwazny/app/full_auth_debug.sh:13:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env || echo "❌ Brak zmiennej AUTH_PASSWORD_HASH")
+/var/www/tatajestwazny/app/full_auth_debug.sh:14:echo "$HASH_LINE"
+/var/www/tatajestwazny/app/full_auth_debug.sh:17:echo "🔐 2. Test password_verify() w PHP..."
+/var/www/tatajestwazny/app/full_auth_debug.sh:19:\$hash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/full_auth_debug.sh:20:if (!\$hash) {
+/var/www/tatajestwazny/app/full_auth_debug.sh:23:        if (strpos(\$line, 'AUTH_PASSWORD_HASH=') === 0) {
+/var/www/tatajestwazny/app/full_auth_debug.sh:24:            \$hash = trim(explode('=', \$line, 2)[1], \" \\\"\");
+/var/www/tatajestwazny/app/full_auth_debug.sh:28:if (password_verify('$PASSWORD', \$hash)) {
+/var/www/tatajestwazny/app/full_auth_debug.sh:39:  -d "password=$PASSWORD" | tee /tmp/response_headers.txt
+/var/www/tatajestwazny/app/full_auth_debug.sh:58:echo "🔁 5. Sprawdzenie obecności include 'auth.php'..."
+/var/www/tatajestwazny/app/full_auth_debug.sh:60:  if grep -q "auth.php" "$file"; then
+/var/www/tatajestwazny/app/full_auth_debug.sh:61:    echo "✅ $file zawiera auth.php"
+/var/www/tatajestwazny/app/full_auth_debug.sh:63:    echo "⚠️  $file NIE zawiera auth.php"
+/var/www/tatajestwazny/app/config/nginx.conf:1:# Nginx snippet to protect admin authentication endpoints.
+/var/www/tatajestwazny/app/config/nginx.conf:4:# Redirect legacy entry point to the main admin login and prevent caching.
+/var/www/tatajestwazny/app/config/nginx.conf:5:location = /auth.php {
+/var/www/tatajestwazny/app/config/nginx.conf:7:    return 302 /admin/auth.php;
+/var/www/tatajestwazny/app/config/nginx.conf:10:# Block execution of any other auth.php files to avoid exposing alternate forms.
+/var/www/tatajestwazny/app/config/nginx.conf:11:location ~ ^/(?!admin/auth\.php$).*auth\.php$ {
+/var/www/tatajestwazny/app/config/nginx/tatajestwazny.local:24:        auth_basic "Restricted Area";
+/var/www/tatajestwazny/app/config/nginx/tatajestwazny.local:25:        auth_basic_user_file /etc/nginx/.htpasswd;
+/var/www/tatajestwazny/app/fix_requires.sh:9:        -e 's@require_once\s+["'"'"']\.\./auth.php["'"'"']@require_once __DIR__ . "/../includes/auth.php"@g' \
+/var/www/tatajestwazny/app/fix_auth_php.sh:2:# 📄 Zastępuje auth.php parserem .env i poprawnym logowaniem
+/var/www/tatajestwazny/app/fix_auth_php.sh:4:AUTH_FILE="public/admin/blog/auth.php"
+/var/www/tatajestwazny/app/fix_auth_php.sh:6:cat > "$AUTH_FILE" << 'EOF'
+/var/www/tatajestwazny/app/fix_auth_php.sh:24:// ✅ Wczytaj hash hasła
+/var/www/tatajestwazny/app/fix_auth_php.sh:25:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/fix_auth_php.sh:28:    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password'])) {
+/var/www/tatajestwazny/app/fix_auth_php.sh:29:        if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/fix_auth_php.sh:40:    echo '<input type="password" name="password" placeholder="Hasło">';
+/var/www/tatajestwazny/app/fix_auth_php.sh:47:echo "✅ auth.php został zaktualizowany z wbudowanym parserem .env"
+/var/www/tatajestwazny/app/src/bootstrap.php:2:require_once __DIR__ . '/../includes/auth.php';
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:6:# 1. Tworzymy centralny auth.php
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:8:cat > includes/auth.php <<'PHP'
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:12:function auth() {
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:14:    header('Location: /admin/auth.php');
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:19:echo "✅ includes/auth.php utworzony"
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:24:require_once __DIR__.'/../../includes/auth.php';
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:25:auth();
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:35:  <li><a href="/admin/reset_password.php" class="text-blue-600 hover:underline">🔐 Zmień hasło</a></li>
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:36:  <li><a href="/admin/auth.php?action=logout" class="text-red-600 hover:underline">🚪 Wyloguj się</a></li>
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:44:# 3. Modyfikujemy auth.php, jeśli istnieje – nadpisujemy wersją z logiką login/logout
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:45:cat > public/admin/auth.php <<'PHP'
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:50:  if ($_POST['password'] === 'tajnehaslo') {
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:61:  header('Location: /admin/auth.php');
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:75:  <input type="password" name="password" placeholder="Hasło" required>
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:80:echo "✅ public/admin/auth.php (logowanie) zaktualizowane"
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:82:# 4. Usuwamy blog/auth.php jeśli istnieje
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:83:if [ -f public/admin/blog/auth.php ]; then
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:84:  rm public/admin/blog/auth.php
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:85:  echo "🗑️  public/admin/blog/auth.php usunięty"
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:96:  if grep -q "require 'csrf.php'; auth();" "$file"; then
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:97:    sed -i '1i<?php require_once __DIR__"/../../../includes/auth.php"; auth(); ?>' "$file"
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:98:    echo "✅ $file — patched (auth)"
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:99:  elif grep -q "require_once '../auth.php';" "$file"; then
+/var/www/tatajestwazny/app/deploy_admin_integration.sh:100:    sed -i 's|require_once \.\./auth\.php|require_once __DIR__."/../../../includes/auth.php"|g' "$file"
+/var/www/tatajestwazny/app/fix_admin_blog_layout.sh:6:AUTH_INCLUDE='require_once "../../includes/auth.php"; auth();'
+/var/www/tatajestwazny/app/fix_admin_blog_layout.sh:25:  # Remove redundant require_once '../auth.php';
+/var/www/tatajestwazny/app/fix_admin_blog_layout.sh:26:  sed -i '/require_once .*auth.php/d' "$file"
+/var/www/tatajestwazny/app/fix_admin_blog_layout.sh:31:  # Check if auth() is already present
+/var/www/tatajestwazny/app/fix_admin_blog_layout.sh:32:  grep -q "auth();" "$file" || sed -i "2i<?php $AUTH_INCLUDE ?>" "$file"
+/var/www/tatajestwazny/app/auth_analysis.log:5:📂 Pliki logowania (auth.php, login.php itp.):
+/var/www/tatajestwazny/app/auth_analysis.log:6:/var/www/tatajestwazny/app/includes/auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:7:/var/www/tatajestwazny/app/public/admin/auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:8:/var/www/tatajestwazny/app/public/auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:9:/var/www/tatajestwazny/app/analyze_auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:12:/var/www/tatajestwazny/app/templates/admin_settings.php:11:      <input type="hidden" name="action" value="update_password">
+/var/www/tatajestwazny/app/auth_analysis.log:13:/var/www/tatajestwazny/app/templates/admin_settings.php:14:        <input type="password" name="old_password" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-slate-100 focus:border-orange-400" required>
+/var/www/tatajestwazny/app/auth_analysis.log:14:/var/www/tatajestwazny/app/templates/admin_settings.php:19:          <input type="password" name="new_password" minlength="8" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-slate-100 focus:border-orange-400" required>
+/var/www/tatajestwazny/app/auth_analysis.log:15:/var/www/tatajestwazny/app/templates/admin_settings.php:22:          <input type="password" name="repeat_password" minlength="8" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-slate-100 focus:border-orange-400" required>
+/var/www/tatajestwazny/app/auth_analysis.log:16:/var/www/tatajestwazny/app/templates/admin_layout.php:35:      <p class="mt-2"><a href="/admin/auth.php?action=logout" class="text-orange-400 hover:text-orange-300">Wyloguj się</a></p>
+/var/www/tatajestwazny/app/auth_analysis.log:17:/var/www/tatajestwazny/app/templates/admin_layout.php:46:        <a href="/admin/auth.php?action=logout" class="text-sm text-orange-400">Wyloguj</a>
+/var/www/tatajestwazny/app/auth_analysis.log:18:/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/auth_analysis.log:19:/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/auth_analysis.log:20:/var/www/tatajestwazny/app/includes/auth.php:77:function auth(): void
+/var/www/tatajestwazny/app/auth_analysis.log:21:/var/www/tatajestwazny/app/includes/auth.php:82:        header('Location: /admin/auth.php');
+/var/www/tatajestwazny/app/auth_analysis.log:22:/var/www/tatajestwazny/app/public/admin/index.php:3:require_once __DIR__ . '/../../includes/auth.php';
+/var/www/tatajestwazny/app/auth_analysis.log:23:/var/www/tatajestwazny/app/public/admin/index.php:7:auth();
+/var/www/tatajestwazny/app/auth_analysis.log:24:/var/www/tatajestwazny/app/public/admin/index.php:191:            'currentHash' => getCurrentPasswordHash(),
+/var/www/tatajestwazny/app/auth_analysis.log:25:/var/www/tatajestwazny/app/public/admin/auth.php:2:require_once __DIR__ . '/../../includes/auth.php';
+/var/www/tatajestwazny/app/auth_analysis.log:26:/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:27:/var/www/tatajestwazny/app/public/admin/auth.php:13:if (!$hash) {
+/var/www/tatajestwazny/app/auth_analysis.log:28:/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/auth_analysis.log:29:/var/www/tatajestwazny/app/public/admin/auth.php:21:    header('Location: /admin/auth.php');
+/var/www/tatajestwazny/app/auth_analysis.log:30:/var/www/tatajestwazny/app/public/admin/auth.php:25:$attemptState = $_SESSION['auth_attempts'] ?? ['count' => 0, 'locked_until' => 0];
+/var/www/tatajestwazny/app/auth_analysis.log:31:/var/www/tatajestwazny/app/public/admin/auth.php:30:    $_SESSION['auth_attempts'] = $attemptState;
+/var/www/tatajestwazny/app/auth_analysis.log:32:/var/www/tatajestwazny/app/public/admin/auth.php:43:    $password = $_POST['password'] ?? '';
+/var/www/tatajestwazny/app/auth_analysis.log:33:/var/www/tatajestwazny/app/public/admin/auth.php:44:    if (password_verify($password, $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:34:/var/www/tatajestwazny/app/public/admin/auth.php:49:        unset($_SESSION['auth_attempts']);
+/var/www/tatajestwazny/app/auth_analysis.log:35:/var/www/tatajestwazny/app/public/admin/auth.php:61:    $_SESSION['auth_attempts'] = $attemptState;
+/var/www/tatajestwazny/app/auth_analysis.log:36:/var/www/tatajestwazny/app/public/admin/auth.php:95:        <input type="password" name="password" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 shadow-inner focus:border-orange-400 focus:ring-0" placeholder="••••••••" required>
+/var/www/tatajestwazny/app/auth_analysis.log:37:/var/www/tatajestwazny/app/public/deploy_tjw.sh:357:# 4) ADMIN (login + listing + edycja)
+/var/www/tatajestwazny/app/auth_analysis.log:38:/var/www/tatajestwazny/app/public/deploy_tjw.sh:360:cat > "$ADM/auth.php" <<'PHP'
+/var/www/tatajestwazny/app/auth_analysis.log:39:/var/www/tatajestwazny/app/public/deploy_tjw.sh:363:const ADMIN_PASS_HASH = '$2y$10$8m2m5wz3rtt8bqgZqO7W5O5m8e8s3S1m2u9mUQ3qgEoZqjZc5w0dW'; // hasło: changeme
+/var/www/tatajestwazny/app/auth_analysis.log:40:/var/www/tatajestwazny/app/public/deploy_tjw.sh:369:require __DIR__ . '/auth.php';
+/var/www/tatajestwazny/app/auth_analysis.log:41:/var/www/tatajestwazny/app/public/deploy_tjw.sh:372:  if (empty($_SESSION['admin'])) { header('Location: /admin/?action=login'); exit; }
+/var/www/tatajestwazny/app/auth_analysis.log:42:/var/www/tatajestwazny/app/public/deploy_tjw.sh:379:if ($action === 'login') {
+/var/www/tatajestwazny/app/auth_analysis.log:43:/var/www/tatajestwazny/app/public/deploy_tjw.sh:382:    if ($u === ADMIN_USER && password_verify($p, ADMIN_PASS_HASH)) {
+/var/www/tatajestwazny/app/auth_analysis.log:44:/var/www/tatajestwazny/app/public/deploy_tjw.sh:396:        <input type="password" class="border p-2 rounded w-full" name="pass" autocomplete="current-password">
+/var/www/tatajestwazny/app/auth_analysis.log:45:/var/www/tatajestwazny/app/public/deploy_tjw.sh:404:if ($action === 'logout') { unset($_SESSION['admin']); redirect('/admin/?action=login'); }
+/var/www/tatajestwazny/app/auth_analysis.log:46:/var/www/tatajestwazny/app/public/deploy_tjw.sh:528:echo "🔐 Panel: http://tatajestwazny.local/admin/  (login: admin / hasło: changeme)"
+/var/www/tatajestwazny/app/auth_analysis.log:47:/var/www/tatajestwazny/app/public/deploy_tjw.sh:529:echo "ℹ️ Zmień hasło edytując $ADM/auth.php (ADMIN_PASS_HASH)."
+/var/www/tatajestwazny/app/auth_analysis.log:48:/var/www/tatajestwazny/app/public/auth.php:3:header('Location: /admin/auth.php', true, 302);
+/var/www/tatajestwazny/app/auth_analysis.log:49:/var/www/tatajestwazny/app/test_auth_env.sh:3:echo "🔍 TEST AUTORYZACJI I ŚRODOWISKA (.env + password_verify + curl)"
+/var/www/tatajestwazny/app/auth_analysis.log:50:/var/www/tatajestwazny/app/test_auth_env.sh:10:  grep AUTH_PASSWORD_HASH .env || echo "❌ Brak AUTH_PASSWORD_HASH w .env"
+/var/www/tatajestwazny/app/auth_analysis.log:51:/var/www/tatajestwazny/app/test_auth_env.sh:13:echo -e "\n🔐 2. Testowanie password_verify w PHP..."
+/var/www/tatajestwazny/app/auth_analysis.log:52:/var/www/tatajestwazny/app/test_auth_env.sh:14:HASH=$(grep AUTH_PASSWORD_HASH .env | cut -d'=' -f2 | tr -d '"')
+/var/www/tatajestwazny/app/auth_analysis.log:53:/var/www/tatajestwazny/app/test_auth_env.sh:15:PHP_TEST=$(php -r "echo password_verify('Entropia.2025', '$HASH') ? '✅ OK' : '❌ BŁĄD';")
+/var/www/tatajestwazny/app/auth_analysis.log:54:/var/www/tatajestwazny/app/test_auth_env.sh:16:echo "Wynik password_verify(): $PHP_TEST"
+/var/www/tatajestwazny/app/auth_analysis.log:55:/var/www/tatajestwazny/app/test_auth_env.sh:18:echo -e "\n📄 3. Sprawdzanie kodu auth.php..."
+/var/www/tatajestwazny/app/auth_analysis.log:56:/var/www/tatajestwazny/app/test_auth_env.sh:19:if grep -q "password_verify" public/auth.php; then
+/var/www/tatajestwazny/app/auth_analysis.log:57:/var/www/tatajestwazny/app/test_auth_env.sh:20:  echo "✅ password_verify obecne w auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:58:/var/www/tatajestwazny/app/test_auth_env.sh:22:  echo "❌ Brak password_verify w auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:59:/var/www/tatajestwazny/app/test_auth_env.sh:28:  -d "password=Entropia.2025" | grep -q "Nieprawidłowe hasło" \
+/var/www/tatajestwazny/app/auth_analysis.log:60:/var/www/tatajestwazny/app/deploy_menu_module.sh:32:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/auth_analysis.log:61:/var/www/tatajestwazny/app/deploy_menu_module.sh:64:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/auth_analysis.log:62:/var/www/tatajestwazny/app/deploy_menu_module.sh:106:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/auth_analysis.log:63:/var/www/tatajestwazny/app/deploy_menu_module.sh:130:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/auth_analysis.log:64:/var/www/tatajestwazny/app/deploy_menu_module.sh:177:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/auth_analysis.log:65:/var/www/tatajestwazny/app/deploy_menu_module.sh:187:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/auth_analysis.log:66:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:9:AUTH_FILE="$BASE_DIR/public/auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:67:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:16:### 1. Generuj hash hasła, jeśli .env nie istnieje
+/var/www/tatajestwazny/app/auth_analysis.log:68:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:19:  read -s PASSWORD
+/var/www/tatajestwazny/app/auth_analysis.log:69:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:20:  HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:70:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:21:  echo "AUTH_PASSWORD_HASH='$HASH'" > "$ENV_FILE"
+/var/www/tatajestwazny/app/auth_analysis.log:71:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:22:  echo "✅ Utworzono plik .env z hashem hasła"
+/var/www/tatajestwazny/app/auth_analysis.log:72:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:27:### 2. auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:73:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:28:cat > "$AUTH_FILE" <<'PHP'
+/var/www/tatajestwazny/app/auth_analysis.log:74:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:31:$hash = getenv('AUTH_PASSWORD_HASH') ?: (getenv('AUTH_PASSWORD_HASH') ?? '');
+/var/www/tatajestwazny/app/auth_analysis.log:75:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:33:if (!$hash) {
+/var/www/tatajestwazny/app/auth_analysis.log:76:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:34:  die('❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:77:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:39:    if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:78:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:50:  echo '<input type="password" name="password" placeholder="Hasło">';
+/var/www/tatajestwazny/app/auth_analysis.log:79:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:57:echo "✅ Stworzono auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:80:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:62:require_once '../auth.php';
+/var/www/tatajestwazny/app/auth_analysis.log:81:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:119:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:82:/var/www/tatajestwazny/app/diagnose_admin_integrity.sh:12:for path in "includes/auth.php" "public/admin/index.php" "public/admin/blog/index.php" "public/includes/layout.php" "db/tjw.sqlite"; do
+/var/www/tatajestwazny/app/auth_analysis.log:83:/var/www/tatajestwazny/app/diagnose_admin_integrity.sh:29:  "http://tatajestwazny.local/admin/login"
+/var/www/tatajestwazny/app/auth_analysis.log:84:/var/www/tatajestwazny/app/diagnose_admin_integrity.sh:46:echo "👀 Sprawdzam logikę auth:"
+/var/www/tatajestwazny/app/auth_analysis.log:85:/var/www/tatajestwazny/app/diagnose_admin_integrity.sh:48:grep -Ri --include="*.php" "require.*auth" . | cut -c 1-140
+/var/www/tatajestwazny/app/auth_analysis.log:86:/var/www/tatajestwazny/app/analyze_auth.php:9:    'password_verify',
+/var/www/tatajestwazny/app/auth_analysis.log:87:/var/www/tatajestwazny/app/analyze_auth.php:10:    'password_hash',
+/var/www/tatajestwazny/app/auth_analysis.log:88:/var/www/tatajestwazny/app/analyze_auth.php:12:    'admin_password',
+/var/www/tatajestwazny/app/auth_analysis.log:89:/var/www/tatajestwazny/app/analyze_auth.php:13:    'password',
+/var/www/tatajestwazny/app/auth_analysis.log:90:/var/www/tatajestwazny/app/analyze_auth.php:14:    'auth',
+/var/www/tatajestwazny/app/auth_analysis.log:91:/var/www/tatajestwazny/app/analyze_auth.php:15:    'verify'
+/var/www/tatajestwazny/app/auth_analysis.log:92:/var/www/tatajestwazny/app/analyze_auth.php:49:    if (preg_match('/admin_password[\'"]?\s*=>\s*[\'"](.+?)[\'"]/', $configContent, $m)) {
+/var/www/tatajestwazny/app/auth_analysis.log:93:/var/www/tatajestwazny/app/analyze_auth.php:50:        echo "✅ Hasło zapisane w konfiguracji jako hash bcrypt:\n";
+/var/www/tatajestwazny/app/auth_analysis.log:94:/var/www/tatajestwazny/app/analyze_auth.php:53:        echo "   docker exec -it tjw_php php -r 'echo password_hash(\"NOWE_HASLO\", PASSWORD_BCRYPT).\"\\n\";'\n";
+/var/www/tatajestwazny/app/auth_analysis.log:95:/var/www/tatajestwazny/app/analyze_auth.php:54:        echo "\n   Następnie wklej wynik do $configFile w miejsce dotychczasowego hasha.\n";
+/var/www/tatajestwazny/app/auth_analysis.log:96:/var/www/tatajestwazny/app/analyze_auth.php:56:        echo "⚠️  Plik config.php istnieje, ale nie znaleziono klucza 'admin_password'.\n";
+/var/www/tatajestwazny/app/auth_analysis.log:97:/var/www/tatajestwazny/app/analyze_auth.php:58:        echo "   return ['admin_password' => 'HASH_TUTAJ'];\n";
+/var/www/tatajestwazny/app/auth_analysis.log:98:/var/www/tatajestwazny/app/analyze_auth.php:62:    echo "   Możliwe, że hasło jest w bazie danych SQLite lub w include auth.php.\n";
+/var/www/tatajestwazny/app/auth_analysis.log:99:/var/www/tatajestwazny/app/analyze_admin_auth.sh:6:LOG_FILE="$APP_PATH/auth_analysis.log"
+/var/www/tatajestwazny/app/auth_analysis.log:100:/var/www/tatajestwazny/app/analyze_admin_auth.sh:13:echo -e "\n📂 Pliki logowania (auth.php, login.php itp.):" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:101:/var/www/tatajestwazny/app/analyze_admin_auth.sh:14:find "$APP_PATH" -type f -iname "*auth*.php" -o -iname "*login*.php" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:102:/var/www/tatajestwazny/app/analyze_admin_auth.sh:18:grep -Rin --color=never -E "password|PASSWORD|verify|hash|bcrypt|login|auth" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:103:/var/www/tatajestwazny/app/analyze_admin_auth.sh:23:  grep -E "password|pass" "$APP_PATH/config/config.php" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:104:/var/www/tatajestwazny/app/analyze_admin_auth.sh:33:  docker exec tjw_php sqlite3 /var/www/html/app/db/tjw.sqlite "SELECT name FROM sqlite_master WHERE sql LIKE '%password%';" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:107:/var/www/tatajestwazny/app/analyze_admin_auth.sh:40:grep -Rin "password_verify" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:108:/var/www/tatajestwazny/app/analyze_admin_auth.sh:41:grep -Rin "password_hash" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:109:/var/www/tatajestwazny/app/analyze_admin_auth.sh:43:# 6️⃣ Analiza includes/auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:110:/var/www/tatajestwazny/app/analyze_admin_auth.sh:44:AUTH_FILE="$APP_PATH/includes/auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:111:/var/www/tatajestwazny/app/analyze_admin_auth.sh:45:if [ -f "$AUTH_FILE" ]; then
+/var/www/tatajestwazny/app/auth_analysis.log:112:/var/www/tatajestwazny/app/analyze_admin_auth.sh:46:  echo -e "\n📜 Fragment pliku auth.php (pierwsze 40 linii):" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:113:/var/www/tatajestwazny/app/analyze_admin_auth.sh:47:  head -n 40 "$AUTH_FILE" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:114:/var/www/tatajestwazny/app/analyze_admin_auth.sh:49:  echo -e "\n⚠️ Brak pliku includes/auth.php" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:115:/var/www/tatajestwazny/app/.git/hooks/pre-applypatch.sample:3:# An example hook script to verify what is about to be committed
+/var/www/tatajestwazny/app/auth_analysis.log:116:/var/www/tatajestwazny/app/.git/hooks/update.sample:63:zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
+/var/www/tatajestwazny/app/auth_analysis.log:117:/var/www/tatajestwazny/app/.git/hooks/pre-merge-commit.sample:3:# An example hook script to verify what is about to be committed.
+/var/www/tatajestwazny/app/auth_analysis.log:118:/var/www/tatajestwazny/app/.git/hooks/push-to-checkout.sample:67:	head=$(git hash-object -t tree --stdin </dev/null)
+/var/www/tatajestwazny/app/auth_analysis.log:119:/var/www/tatajestwazny/app/.git/hooks/pre-commit.sample:3:# An example hook script to verify what is about to be committed.
+/var/www/tatajestwazny/app/auth_analysis.log:120:/var/www/tatajestwazny/app/.git/hooks/pre-commit.sample:10:if git rev-parse --verify HEAD >/dev/null 2>&1
+/var/www/tatajestwazny/app/auth_analysis.log:121:/var/www/tatajestwazny/app/.git/hooks/pre-commit.sample:15:	against=$(git hash-object -t tree /dev/null)
+/var/www/tatajestwazny/app/auth_analysis.log:122:/var/www/tatajestwazny/app/.git/hooks/commit-msg.sample:15:# SOB=$(git var GIT_AUTHOR_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
+/var/www/tatajestwazny/app/auth_analysis.log:123:/var/www/tatajestwazny/app/.git/hooks/pre-push.sample:3:# An example hook script to verify what is about to be pushed.  Called by "git
+/var/www/tatajestwazny/app/auth_analysis.log:124:/var/www/tatajestwazny/app/.git/hooks/pre-push.sample:25:zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
+/var/www/tatajestwazny/app/auth_analysis.log:125:/var/www/tatajestwazny/app/.git/packed-refs:3:3e66ec6830d5fff8ef75df2b1fc94149f6b78409 refs/remotes/origin/codex/analyze-login-mechanism-and-create-reset-script
+/var/www/tatajestwazny/app/auth_analysis.log:126:/var/www/tatajestwazny/app/.git/packed-refs:8:714c43b41fe0ac1edec67abbf5047380c6da0b81 refs/remotes/origin/codex/replace-public/auth.php-with-redirect
+/var/www/tatajestwazny/app/auth_analysis.log:127:/var/www/tatajestwazny/app/deploy_auth_module.sh:5:read -sp "🔑 Podaj hasło do panelu administracyjnego: " PASSWORD
+/var/www/tatajestwazny/app/auth_analysis.log:128:/var/www/tatajestwazny/app/deploy_auth_module.sh:8:HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:129:/var/www/tatajestwazny/app/deploy_auth_module.sh:9:echo "AUTH_PASSWORD_HASH=\"$HASH\"" > .env
+/var/www/tatajestwazny/app/auth_analysis.log:130:/var/www/tatajestwazny/app/deploy_auth_module.sh:10:echo "✅ Utworzono plik .env z hashem hasła"
+/var/www/tatajestwazny/app/auth_analysis.log:131:/var/www/tatajestwazny/app/deploy_auth_module.sh:29:# auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:132:/var/www/tatajestwazny/app/deploy_auth_module.sh:30:cat > public/admin/auth.php <<EOF
+/var/www/tatajestwazny/app/auth_analysis.log:133:/var/www/tatajestwazny/app/deploy_auth_module.sh:35:\$storedHash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:134:/var/www/tatajestwazny/app/deploy_auth_module.sh:39:    if (password_verify(\$_POST['password'], \$storedHash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:135:/var/www/tatajestwazny/app/deploy_auth_module.sh:50:  echo '<input type="password" name="password" placeholder="Hasło">';
+/var/www/tatajestwazny/app/auth_analysis.log:136:/var/www/tatajestwazny/app/deploy_auth_module.sh:56:echo "✅ Stworzono auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:137:/var/www/tatajestwazny/app/deploy_auth_module.sh:61:require_once '../auth.php';
+/var/www/tatajestwazny/app/auth_analysis.log:138:/var/www/tatajestwazny/app/deploy_auth_module.sh:116:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:139:/var/www/tatajestwazny/app/deploy_admin_panel.sh:17:auth();
+/var/www/tatajestwazny/app/auth_analysis.log:140:/var/www/tatajestwazny/app/deploy_admin_panel.sh:35:auth();
+/var/www/tatajestwazny/app/auth_analysis.log:141:/var/www/tatajestwazny/app/deploy_admin_panel.sh:61:auth();
+/var/www/tatajestwazny/app/auth_analysis.log:142:/var/www/tatajestwazny/app/deploy_admin_panel.sh:75:# csrf.php - zabezpieczenia + Basic Auth
+/var/www/tatajestwazny/app/auth_analysis.log:143:/var/www/tatajestwazny/app/deploy_admin_panel.sh:88:  if (!hash_equals($_SESSION['csrf'] ?? '', $token)) {
+/var/www/tatajestwazny/app/auth_analysis.log:144:/var/www/tatajestwazny/app/deploy_admin_panel.sh:93:function auth() {
+/var/www/tatajestwazny/app/auth_analysis.log:145:/var/www/tatajestwazny/app/deploy_admin_panel.sh:97:  if (!isset($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) ||
+/var/www/tatajestwazny/app/auth_analysis.log:146:/var/www/tatajestwazny/app/deploy_admin_panel.sh:98:      $_SERVER['PHP_AUTH_USER'] !== $USER ||
+/var/www/tatajestwazny/app/auth_analysis.log:147:/var/www/tatajestwazny/app/deploy_admin_panel.sh:99:      $_SERVER['PHP_AUTH_PW'] !== $PASS) {
+/var/www/tatajestwazny/app/auth_analysis.log:148:/var/www/tatajestwazny/app/deploy_admin_panel.sh:100:    header('WWW-Authenticate: Basic realm="Admin"');
+/var/www/tatajestwazny/app/auth_analysis.log:149:/var/www/tatajestwazny/app/deploy_admin_panel.sh:101:    header('HTTP/1.0 401 Unauthorized');
+/var/www/tatajestwazny/app/auth_analysis.log:150:/var/www/tatajestwazny/app/add_auth_include.sh:2:# Skrypt: Dodaje require_once '../auth.php'; na górze plików admin/blog
+/var/www/tatajestwazny/app/auth_analysis.log:151:/var/www/tatajestwazny/app/add_auth_include.sh:13:    if grep -q "require_once '../auth.php';" "$file"; then
+/var/www/tatajestwazny/app/auth_analysis.log:152:/var/www/tatajestwazny/app/add_auth_include.sh:14:      echo "✅ $file - już zawiera auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:153:/var/www/tatajestwazny/app/add_auth_include.sh:18:        sed -i "0,/<?php/ s/<?php/<?php\nrequire_once '..\/auth.php';/" "$file"
+/var/www/tatajestwazny/app/auth_analysis.log:154:/var/www/tatajestwazny/app/full_auth_debug.sh:7:PASSWORD="MuremZaOjcami.1"
+/var/www/tatajestwazny/app/auth_analysis.log:155:/var/www/tatajestwazny/app/full_auth_debug.sh:13:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env || echo "❌ Brak zmiennej AUTH_PASSWORD_HASH")
+/var/www/tatajestwazny/app/auth_analysis.log:156:/var/www/tatajestwazny/app/full_auth_debug.sh:14:echo "$HASH_LINE"
+/var/www/tatajestwazny/app/auth_analysis.log:157:/var/www/tatajestwazny/app/full_auth_debug.sh:17:echo "🔐 2. Test password_verify() w PHP..."
+/var/www/tatajestwazny/app/auth_analysis.log:158:/var/www/tatajestwazny/app/full_auth_debug.sh:19:\$hash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:159:/var/www/tatajestwazny/app/full_auth_debug.sh:20:if (!\$hash) {
+/var/www/tatajestwazny/app/auth_analysis.log:160:/var/www/tatajestwazny/app/full_auth_debug.sh:23:        if (strpos(\$line, 'AUTH_PASSWORD_HASH=') === 0) {
+/var/www/tatajestwazny/app/auth_analysis.log:161:/var/www/tatajestwazny/app/full_auth_debug.sh:24:            \$hash = trim(explode('=', \$line, 2)[1], \" \\\"\");
+/var/www/tatajestwazny/app/auth_analysis.log:162:/var/www/tatajestwazny/app/full_auth_debug.sh:28:if (password_verify('$PASSWORD', \$hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:163:/var/www/tatajestwazny/app/full_auth_debug.sh:39:  -d "password=$PASSWORD" | tee /tmp/response_headers.txt
+/var/www/tatajestwazny/app/auth_analysis.log:164:/var/www/tatajestwazny/app/full_auth_debug.sh:58:echo "🔁 5. Sprawdzenie obecności include 'auth.php'..."
+/var/www/tatajestwazny/app/auth_analysis.log:165:/var/www/tatajestwazny/app/full_auth_debug.sh:60:  if grep -q "auth.php" "$file"; then
+/var/www/tatajestwazny/app/auth_analysis.log:166:/var/www/tatajestwazny/app/full_auth_debug.sh:61:    echo "✅ $file zawiera auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:167:/var/www/tatajestwazny/app/full_auth_debug.sh:63:    echo "⚠️  $file NIE zawiera auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:168:/var/www/tatajestwazny/app/config/nginx.conf:1:# Nginx snippet to protect admin authentication endpoints.
+/var/www/tatajestwazny/app/auth_analysis.log:169:/var/www/tatajestwazny/app/config/nginx.conf:4:# Redirect legacy entry point to the main admin login and prevent caching.
+/var/www/tatajestwazny/app/auth_analysis.log:170:/var/www/tatajestwazny/app/config/nginx.conf:5:location = /auth.php {
+/var/www/tatajestwazny/app/auth_analysis.log:171:/var/www/tatajestwazny/app/config/nginx.conf:7:    return 302 /admin/auth.php;
+/var/www/tatajestwazny/app/auth_analysis.log:172:/var/www/tatajestwazny/app/config/nginx.conf:10:# Block execution of any other auth.php files to avoid exposing alternate forms.
+/var/www/tatajestwazny/app/auth_analysis.log:173:/var/www/tatajestwazny/app/config/nginx.conf:11:location ~ ^/(?!admin/auth\.php$).*auth\.php$ {
+/var/www/tatajestwazny/app/auth_analysis.log:174:/var/www/tatajestwazny/app/config/nginx/tatajestwazny.local:24:        auth_basic "Restricted Area";
+/var/www/tatajestwazny/app/auth_analysis.log:175:/var/www/tatajestwazny/app/config/nginx/tatajestwazny.local:25:        auth_basic_user_file /etc/nginx/.htpasswd;
+/var/www/tatajestwazny/app/auth_analysis.log:176:/var/www/tatajestwazny/app/fix_requires.sh:9:        -e 's@require_once\s+["'"'"']\.\./auth.php["'"'"']@require_once __DIR__ . "/../includes/auth.php"@g' \
+/var/www/tatajestwazny/app/auth_analysis.log:177:/var/www/tatajestwazny/app/fix_auth_php.sh:2:# 📄 Zastępuje auth.php parserem .env i poprawnym logowaniem
+/var/www/tatajestwazny/app/auth_analysis.log:178:/var/www/tatajestwazny/app/fix_auth_php.sh:4:AUTH_FILE="public/admin/blog/auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:179:/var/www/tatajestwazny/app/fix_auth_php.sh:6:cat > "$AUTH_FILE" << 'EOF'
+/var/www/tatajestwazny/app/auth_analysis.log:180:/var/www/tatajestwazny/app/fix_auth_php.sh:24:// ✅ Wczytaj hash hasła
+/var/www/tatajestwazny/app/auth_analysis.log:181:/var/www/tatajestwazny/app/fix_auth_php.sh:25:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/auth_analysis.log:182:/var/www/tatajestwazny/app/fix_auth_php.sh:28:    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password'])) {
+/var/www/tatajestwazny/app/auth_analysis.log:183:/var/www/tatajestwazny/app/fix_auth_php.sh:29:        if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:184:/var/www/tatajestwazny/app/fix_auth_php.sh:40:    echo '<input type="password" name="password" placeholder="Hasło">';
+/var/www/tatajestwazny/app/auth_analysis.log:185:/var/www/tatajestwazny/app/fix_auth_php.sh:47:echo "✅ auth.php został zaktualizowany z wbudowanym parserem .env"
+/var/www/tatajestwazny/app/auth_analysis.log:186:/var/www/tatajestwazny/app/src/bootstrap.php:2:require_once __DIR__ . '/../includes/auth.php';
+/var/www/tatajestwazny/app/auth_analysis.log:187:/var/www/tatajestwazny/app/deploy_admin_integration.sh:6:# 1. Tworzymy centralny auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:188:/var/www/tatajestwazny/app/deploy_admin_integration.sh:8:cat > includes/auth.php <<'PHP'
+/var/www/tatajestwazny/app/auth_analysis.log:189:/var/www/tatajestwazny/app/deploy_admin_integration.sh:12:function auth() {
+/var/www/tatajestwazny/app/auth_analysis.log:190:/var/www/tatajestwazny/app/deploy_admin_integration.sh:14:    header('Location: /admin/auth.php');
+/var/www/tatajestwazny/app/auth_analysis.log:191:/var/www/tatajestwazny/app/deploy_admin_integration.sh:19:echo "✅ includes/auth.php utworzony"
+/var/www/tatajestwazny/app/auth_analysis.log:192:/var/www/tatajestwazny/app/deploy_admin_integration.sh:24:require_once __DIR__.'/../../includes/auth.php';
+/var/www/tatajestwazny/app/auth_analysis.log:193:/var/www/tatajestwazny/app/deploy_admin_integration.sh:25:auth();
+/var/www/tatajestwazny/app/auth_analysis.log:194:/var/www/tatajestwazny/app/deploy_admin_integration.sh:35:  <li><a href="/admin/reset_password.php" class="text-blue-600 hover:underline">🔐 Zmień hasło</a></li>
+/var/www/tatajestwazny/app/auth_analysis.log:195:/var/www/tatajestwazny/app/deploy_admin_integration.sh:36:  <li><a href="/admin/auth.php?action=logout" class="text-red-600 hover:underline">🚪 Wyloguj się</a></li>
+/var/www/tatajestwazny/app/auth_analysis.log:196:/var/www/tatajestwazny/app/deploy_admin_integration.sh:44:# 3. Modyfikujemy auth.php, jeśli istnieje – nadpisujemy wersją z logiką login/logout
+/var/www/tatajestwazny/app/auth_analysis.log:197:/var/www/tatajestwazny/app/deploy_admin_integration.sh:45:cat > public/admin/auth.php <<'PHP'
+/var/www/tatajestwazny/app/auth_analysis.log:198:/var/www/tatajestwazny/app/deploy_admin_integration.sh:50:  if ($_POST['password'] === 'tajnehaslo') {
+/var/www/tatajestwazny/app/auth_analysis.log:199:/var/www/tatajestwazny/app/deploy_admin_integration.sh:61:  header('Location: /admin/auth.php');
+/var/www/tatajestwazny/app/auth_analysis.log:200:/var/www/tatajestwazny/app/deploy_admin_integration.sh:75:  <input type="password" name="password" placeholder="Hasło" required>
+/var/www/tatajestwazny/app/auth_analysis.log:201:/var/www/tatajestwazny/app/deploy_admin_integration.sh:80:echo "✅ public/admin/auth.php (logowanie) zaktualizowane"
+/var/www/tatajestwazny/app/auth_analysis.log:202:/var/www/tatajestwazny/app/deploy_admin_integration.sh:82:# 4. Usuwamy blog/auth.php jeśli istnieje
+/var/www/tatajestwazny/app/auth_analysis.log:203:/var/www/tatajestwazny/app/deploy_admin_integration.sh:83:if [ -f public/admin/blog/auth.php ]; then
+/var/www/tatajestwazny/app/auth_analysis.log:204:/var/www/tatajestwazny/app/deploy_admin_integration.sh:84:  rm public/admin/blog/auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:205:/var/www/tatajestwazny/app/deploy_admin_integration.sh:85:  echo "🗑️  public/admin/blog/auth.php usunięty"
+/var/www/tatajestwazny/app/auth_analysis.log:206:/var/www/tatajestwazny/app/deploy_admin_integration.sh:96:  if grep -q "require 'csrf.php'; auth();" "$file"; then
+/var/www/tatajestwazny/app/auth_analysis.log:207:/var/www/tatajestwazny/app/deploy_admin_integration.sh:97:    sed -i '1i<?php require_once __DIR__"/../../../includes/auth.php"; auth(); ?>' "$file"
+/var/www/tatajestwazny/app/auth_analysis.log:208:/var/www/tatajestwazny/app/deploy_admin_integration.sh:98:    echo "✅ $file — patched (auth)"
+/var/www/tatajestwazny/app/auth_analysis.log:209:/var/www/tatajestwazny/app/deploy_admin_integration.sh:99:  elif grep -q "require_once '../auth.php';" "$file"; then
+/var/www/tatajestwazny/app/auth_analysis.log:210:/var/www/tatajestwazny/app/deploy_admin_integration.sh:100:    sed -i 's|require_once \.\./auth\.php|require_once __DIR__."/../../../includes/auth.php"|g' "$file"
+/var/www/tatajestwazny/app/auth_analysis.log:211:/var/www/tatajestwazny/app/fix_admin_blog_layout.sh:6:AUTH_INCLUDE='require_once "../../includes/auth.php"; auth();'
+/var/www/tatajestwazny/app/auth_analysis.log:212:/var/www/tatajestwazny/app/fix_admin_blog_layout.sh:25:  # Remove redundant require_once '../auth.php';
+/var/www/tatajestwazny/app/auth_analysis.log:213:/var/www/tatajestwazny/app/fix_admin_blog_layout.sh:26:  sed -i '/require_once .*auth.php/d' "$file"
+/var/www/tatajestwazny/app/auth_analysis.log:214:/var/www/tatajestwazny/app/fix_admin_blog_layout.sh:31:  # Check if auth() is already present
+/var/www/tatajestwazny/app/auth_analysis.log:215:/var/www/tatajestwazny/app/fix_admin_blog_layout.sh:32:  grep -q "auth();" "$file" || sed -i "2i<?php $AUTH_INCLUDE ?>" "$file"
+/var/www/tatajestwazny/app/auth_analysis.log:216:/var/www/tatajestwazny/app/auth_analysis.log:5:📂 Pliki logowania (auth.php, login.php itp.):
+/var/www/tatajestwazny/app/auth_analysis.log:217:/var/www/tatajestwazny/app/auth_analysis.log:6:/var/www/tatajestwazny/app/includes/auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:218:/var/www/tatajestwazny/app/auth_analysis.log:7:/var/www/tatajestwazny/app/public/admin/auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:219:/var/www/tatajestwazny/app/auth_analysis.log:8:/var/www/tatajestwazny/app/public/auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:220:/var/www/tatajestwazny/app/auth_analysis.log:9:/var/www/tatajestwazny/app/analyze_auth.php
+/var/www/tatajestwazny/app/auth_analysis.log:221:/var/www/tatajestwazny/app/auth_analysis.log:12:/var/www/tatajestwazny/app/templates/admin_settings.php:11:      <input type="hidden" name="action" value="update_password">
+/var/www/tatajestwazny/app/auth_analysis.log:222:/var/www/tatajestwazny/app/auth_analysis.log:13:/var/www/tatajestwazny/app/templates/admin_settings.php:14:        <input type="password" name="old_password" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-slate-100 focus:border-orange-400" required>
+/var/www/tatajestwazny/app/auth_analysis.log:223:/var/www/tatajestwazny/app/auth_analysis.log:14:/var/www/tatajestwazny/app/templates/admin_settings.php:19:          <input type="password" name="new_password" minlength="8" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-slate-100 focus:border-orange-400" required>
+/var/www/tatajestwazny/app/auth_analysis.log:224:/var/www/tatajestwazny/app/auth_analysis.log:15:/var/www/tatajestwazny/app/templates/admin_settings.php:22:          <input type="password" name="repeat_password" minlength="8" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-slate-100 focus:border-orange-400" required>
+/var/www/tatajestwazny/app/auth_analysis.log:225:/var/www/tatajestwazny/app/auth_analysis.log:16:/var/www/tatajestwazny/app/templates/admin_layout.php:35:      <p class="mt-2"><a href="/admin/auth.php?action=logout" class="text-orange-400 hover:text-orange-300">Wyloguj się</a></p>
+/var/www/tatajestwazny/app/auth_analysis.log:226:/var/www/tatajestwazny/app/auth_analysis.log:17:/var/www/tatajestwazny/app/templates/admin_layout.php:46:        <a href="/admin/auth.php?action=logout" class="text-sm text-orange-400">Wyloguj</a>
+/var/www/tatajestwazny/app/auth_analysis.log:227:/var/www/tatajestwazny/app/auth_analysis.log:18:/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/auth_analysis.log:228:/var/www/tatajestwazny/app/auth_analysis.log:19:/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/auth_analysis.log:229:/var/www/tatajestwazny/app/auth_analysis.log:20:/var/www/tatajestwazny/app/includes/auth.php:77:function auth(): void
+/var/www/tatajestwazny/app/auth_analysis.log:230:/var/www/tatajestwazny/app/auth_analysis.log:21:/var/www/tatajestwazny/app/includes/auth.php:82:        header('Location: /admin/auth.php');
+/var/www/tatajestwazny/app/auth_analysis.log:231:/var/www/tatajestwazny/app/auth_analysis.log:22:/var/www/tatajestwazny/app/public/admin/index.php:3:require_once __DIR__ . '/../../includes/auth.php';
+/var/www/tatajestwazny/app/auth_analysis.log:232:/var/www/tatajestwazny/app/auth_analysis.log:23:/var/www/tatajestwazny/app/public/admin/index.php:7:auth();
+/var/www/tatajestwazny/app/auth_analysis.log:233:/var/www/tatajestwazny/app/auth_analysis.log:24:/var/www/tatajestwazny/app/public/admin/index.php:191:            'currentHash' => getCurrentPasswordHash(),
+/var/www/tatajestwazny/app/auth_analysis.log:234:/var/www/tatajestwazny/app/auth_analysis.log:25:/var/www/tatajestwazny/app/public/admin/auth.php:2:require_once __DIR__ . '/../../includes/auth.php';
+/var/www/tatajestwazny/app/auth_analysis.log:235:/var/www/tatajestwazny/app/auth_analysis.log:26:/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:236:/var/www/tatajestwazny/app/auth_analysis.log:27:/var/www/tatajestwazny/app/public/admin/auth.php:13:if (!$hash) {
+/var/www/tatajestwazny/app/auth_analysis.log:237:/var/www/tatajestwazny/app/auth_analysis.log:28:/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/auth_analysis.log:238:/var/www/tatajestwazny/app/auth_analysis.log:29:/var/www/tatajestwazny/app/public/admin/auth.php:21:    header('Location: /admin/auth.php');
+/var/www/tatajestwazny/app/auth_analysis.log:239:/var/www/tatajestwazny/app/auth_analysis.log:30:/var/www/tatajestwazny/app/public/admin/auth.php:25:$attemptState = $_SESSION['auth_attempts'] ?? ['count' => 0, 'locked_until' => 0];
+/var/www/tatajestwazny/app/auth_analysis.log:240:/var/www/tatajestwazny/app/auth_analysis.log:31:/var/www/tatajestwazny/app/public/admin/auth.php:30:    $_SESSION['auth_attempts'] = $attemptState;
+/var/www/tatajestwazny/app/auth_analysis.log:241:/var/www/tatajestwazny/app/auth_an
+/var/www/tatajestwazny/app/debug_password_hash.sh:3:echo "🔍 DEBUG HASHOWANIA HASŁA (reset_admin_password.sh, .env, PHP)"
+/var/www/tatajestwazny/app/debug_password_hash.sh:5:# 1. Wyciągnij hash z pliku .env
+/var/www/tatajestwazny/app/debug_password_hash.sh:6:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env)
+/var/www/tatajestwazny/app/debug_password_hash.sh:7:HASH=$(echo "$HASH_LINE" | cut -d'=' -f2- | tr -d '"')
+/var/www/tatajestwazny/app/debug_password_hash.sh:9:echo -e "\n🔐 1. Wczytany hash z .env:"
+/var/www/tatajestwazny/app/debug_password_hash.sh:10:echo "$HASH"
+/var/www/tatajestwazny/app/debug_password_hash.sh:12:# 2. Czy wygląda jak poprawny bcrypt?
+/var/www/tatajestwazny/app/debug_password_hash.sh:13:if [[ $HASH =~ ^\$2[aby]?\$[0-9]{2}\$.*$ ]]; then
+/var/www/tatajestwazny/app/debug_password_hash.sh:14:  echo "✅ Format hash wygląda poprawnie (bcrypt)"
+/var/www/tatajestwazny/app/debug_password_hash.sh:16:  echo "❌ Format nie wygląda jak poprawny hash bcrypt!"
+/var/www/tatajestwazny/app/debug_password_hash.sh:19:# 3. Test manualnego hashowania
+/var/www/tatajestwazny/app/debug_password_hash.sh:21:PHP_VERIFY=$(php -r "echo password_verify('$TEST_PASS', '$HASH') ? '✅ Hasło OK' : '❌ Hasło NIE PASUJE';")
+/var/www/tatajestwazny/app/debug_password_hash.sh:22:echo -e "\n🧪 2. Test password_verify() w PHP:\n$PHP_VERIFY"
+/var/www/tatajestwazny/app/debug_password_hash.sh:24:# 4. Dodatkowo spróbuj hashować i porównać
+/var/www/tatajestwazny/app/debug_password_hash.sh:25:NEW_HASH=$(php -r "echo password_hash('$TEST_PASS', PASSWORD_BCRYPT);")
+/var/www/tatajestwazny/app/debug_password_hash.sh:26:echo -e "\n🔁 3. Nowy hash tego samego hasła (dla porównania):"
+/var/www/tatajestwazny/app/debug_password_hash.sh:27:echo "$NEW_HASH"
+/var/www/tatajestwazny/app/debug_password_hash.sh:30:echo -e "\n🌍 4. Sprawdzenie dostępności AUTH_PASSWORD_HASH przez PHP (getenv + $_ENV):"
+/var/www/tatajestwazny/app/debug_password_hash.sh:32:\$env = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/debug_password_hash.sh:33:\$superglobal = \$_ENV['AUTH_PASSWORD_HASH'] ?? null;
+/var/www/tatajestwazny/app/debug_password_hash.sh:38:# 6. Szybka walidacja auth.php jeśli istnieje
+/var/www/tatajestwazny/app/debug_password_hash.sh:39:if [[ -f public/auth.php ]]; then
+/var/www/tatajestwazny/app/debug_password_hash.sh:40:  echo -e "\n📄 5. Sprawdzenie, czy auth.php ładuje .env..."
+/var/www/tatajestwazny/app/debug_password_hash.sh:41:  if grep -q "AUTH_PASSWORD_HASH" public/auth.php; then
+/var/www/tatajestwazny/app/debug_password_hash.sh:42:    echo "✅ auth.php używa AUTH_PASSWORD_HASH"
+/var/www/tatajestwazny/app/debug_password_hash.sh:44:    echo "❌ auth.php nie używa AUTH_PASSWORD_HASH!"
+/var/www/tatajestwazny/app/debug_password_hash.sh:49:echo "🔧 Jeśli chcesz naprawić, uruchom ponownie: ./reset_admin_password.sh"
+/var/www/tatajestwazny/app/reset_admin_password.sh:14:  --show-hash    wylicz i pokaż hash bez modyfikacji plików
+/var/www/tatajestwazny/app/reset_admin_password.sh:21:  bash $SCRIPT_NAME --show-hash "NoweHaslo123!"
+/var/www/tatajestwazny/app/reset_admin_password.sh:26:show_hash=false
+/var/www/tatajestwazny/app/reset_admin_password.sh:28:password_arg=""
+/var/www/tatajestwazny/app/reset_admin_password.sh:35:    --show-hash)
+/var/www/tatajestwazny/app/reset_admin_password.sh:36:      show_hash=true
+/var/www/tatajestwazny/app/reset_admin_password.sh:48:        if [[ -n "$password_arg" ]]; then
+/var/www/tatajestwazny/app/reset_admin_password.sh:52:        password_arg="$1"
+/var/www/tatajestwazny/app/reset_admin_password.sh:63:      if [[ -n "$password_arg" ]]; then
+/var/www/tatajestwazny/app/reset_admin_password.sh:67:      password_arg="$1"
+/var/www/tatajestwazny/app/reset_admin_password.sh:76:if $random && [[ -n "$password_arg" ]]; then
+/var/www/tatajestwazny/app/reset_admin_password.sh:87:  password=$(php -r 'echo rtrim(strtr(base64_encode(random_bytes(18)),"+/","-_"),"=");')
+/var/www/tatajestwazny/app/reset_admin_password.sh:89:  password="$password_arg"
+/var/www/tatajestwazny/app/reset_admin_password.sh:92:if [[ -z "$password" ]]; then
+/var/www/tatajestwazny/app/reset_admin_password.sh:93:  IFS= read -rs -p "🔑 Podaj nowe hasło administratora: " password
+/var/www/tatajestwazny/app/reset_admin_password.sh:97:if [[ -z "$password" ]]; then
+/var/www/tatajestwazny/app/reset_admin_password.sh:102:hash=$(php -r 'echo password_hash($argv[1], PASSWORD_DEFAULT);' "$password")
+/var/www/tatajestwazny/app/reset_admin_password.sh:104:if $show_hash; then
+/var/www/tatajestwazny/app/reset_admin_password.sh:105:  echo "🔐 Hasło: $password"
+/var/www/tatajestwazny/app/reset_admin_password.sh:106:  echo "AUTH_PASSWORD_HASH=\"$hash\""
+/var/www/tatajestwazny/app/reset_admin_password.sh:121:if grep -q '^AUTH_PASSWORD_HASH=' "$new_tmp"; then
+/var/www/tatajestwazny/app/reset_admin_password.sh:122:  sed -i "s|^AUTH_PASSWORD_HASH=.*|AUTH_PASSWORD_HASH=\"$hash\"|" "$new_tmp"
+/var/www/tatajestwazny/app/reset_admin_password.sh:130:  printf 'AUTH_PASSWORD_HASH="%s"\n' "$hash" >>"$new_tmp"
+/var/www/tatajestwazny/app/reset_admin_password.sh:160:echo "🔐 Nowe hasło: $password"
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:7:TARGET_PHP="$BASE_DIR/public/admin/reset_password.php"
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:10:# Tworzenie reset_password.php
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:13:require_once '../auth.php';
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:17:$currentHash = $envVars['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:20:    $old = $_POST['old_password'] ?? '';
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:21:    $new = $_POST['new_password'] ?? '';
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:22:    $repeat = $_POST['repeat_password'] ?? '';
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:24:    if (!password_verify($old, $currentHash)) {
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:31:        $newHash = password_hash($new, PASSWORD_DEFAULT);
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:34:            if (str_starts_with($line, 'AUTH_PASSWORD_HASH=')) {
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:35:                $line = "AUTH_PASSWORD_HASH=\"$newHash\"\n";
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:55:    <p>Stare hasło: <input type="password" name="old_password" required></p>
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:56:    <p>Nowe hasło: <input type="password" name="new_password" required></p>
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:57:    <p>Powtórz nowe hasło: <input type="password" name="repeat_password" required></p>
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:68:if ! grep -q "reset_password.php" "$INDEX_PHP"; then
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:69:    sed -i '/<\/body>/i <p><a href="\/admin\/reset_password.php">🔑 Zmień hasło</a></p>' "$INDEX_PHP"
+/var/www/tatajestwazny/app/deploy_pages_module.sh:32:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/deploy_pages_module.sh:53:<?php require 'csrf.php'; auth(); ?>
+/var/www/tatajestwazny/app/deploy_pages_module.sh:70:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/deploy_pages_module.sh:95:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/deploy_pages_module.sh:118:<?php require 'csrf.php'; auth();
+/var/www/tatajestwazny/app/test_admin_panel.sh:5:ADMIN_PASSWORD="tajnehaslo"
+/var/www/tatajestwazny/app/test_admin_panel.sh:22:curl -s -c "$COOKIE_FILE" -d "password=$ADMIN_PASSWORD" "$BASE_URL/admin/auth.php" > /dev/null
+
+⚙️ Sprawdzanie pliku konfiguracyjnego config.php:
+
+🗄️ Analiza bazy danych SQLite:
+OCI runtime exec failed: exec failed: unable to start container process: exec: "sqlite3": executable file not found in $PATH: unknown
+OCI runtime exec failed: exec failed: unable to start container process: exec: "sqlite3": executable file not found in $PATH: unknown
+
+🔍 Szukanie funkcji password_verify / password_hash:
+/var/www/tatajestwazny/app/public/admin/auth.php:44:    if (password_verify($password, $hash)) {
+/var/www/tatajestwazny/app/public/deploy_tjw.sh:382:    if ($u === ADMIN_USER && password_verify($p, ADMIN_PASS_HASH)) {
+/var/www/tatajestwazny/app/test_auth_env.sh:3:echo "🔍 TEST AUTORYZACJI I ŚRODOWISKA (.env + password_verify + curl)"
+/var/www/tatajestwazny/app/test_auth_env.sh:13:echo -e "\n🔐 2. Testowanie password_verify w PHP..."
+/var/www/tatajestwazny/app/test_auth_env.sh:15:PHP_TEST=$(php -r "echo password_verify('Entropia.2025', '$HASH') ? '✅ OK' : '❌ BŁĄD';")
+/var/www/tatajestwazny/app/test_auth_env.sh:16:echo "Wynik password_verify(): $PHP_TEST"
+/var/www/tatajestwazny/app/test_auth_env.sh:19:if grep -q "password_verify" public/auth.php; then
+/var/www/tatajestwazny/app/test_auth_env.sh:20:  echo "✅ password_verify obecne w auth.php"
+/var/www/tatajestwazny/app/test_auth_env.sh:22:  echo "❌ Brak password_verify w auth.php"
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:39:    if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/analyze_auth.php:9:    'password_verify',
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:40:grep -Rin "password_verify" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/deploy_auth_module.sh:39:    if (password_verify(\$_POST['password'], \$storedHash)) {
+/var/www/tatajestwazny/app/full_auth_debug.sh:17:echo "🔐 2. Test password_verify() w PHP..."
+/var/www/tatajestwazny/app/full_auth_debug.sh:28:if (password_verify('$PASSWORD', \$hash)) {
+/var/www/tatajestwazny/app/fix_auth_php.sh:29:        if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:33:/var/www/tatajestwazny/app/public/admin/auth.php:44:    if (password_verify($password, $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:43:/var/www/tatajestwazny/app/public/deploy_tjw.sh:382:    if ($u === ADMIN_USER && password_verify($p, ADMIN_PASS_HASH)) {
+/var/www/tatajestwazny/app/auth_analysis.log:49:/var/www/tatajestwazny/app/test_auth_env.sh:3:echo "🔍 TEST AUTORYZACJI I ŚRODOWISKA (.env + password_verify + curl)"
+/var/www/tatajestwazny/app/auth_analysis.log:51:/var/www/tatajestwazny/app/test_auth_env.sh:13:echo -e "\n🔐 2. Testowanie password_verify w PHP..."
+/var/www/tatajestwazny/app/auth_analysis.log:53:/var/www/tatajestwazny/app/test_auth_env.sh:15:PHP_TEST=$(php -r "echo password_verify('Entropia.2025', '$HASH') ? '✅ OK' : '❌ BŁĄD';")
+/var/www/tatajestwazny/app/auth_analysis.log:54:/var/www/tatajestwazny/app/test_auth_env.sh:16:echo "Wynik password_verify(): $PHP_TEST"
+/var/www/tatajestwazny/app/auth_analysis.log:56:/var/www/tatajestwazny/app/test_auth_env.sh:19:if grep -q "password_verify" public/auth.php; then
+/var/www/tatajestwazny/app/auth_analysis.log:57:/var/www/tatajestwazny/app/test_auth_env.sh:20:  echo "✅ password_verify obecne w auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:58:/var/www/tatajestwazny/app/test_auth_env.sh:22:  echo "❌ Brak password_verify w auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:77:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:39:    if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:86:/var/www/tatajestwazny/app/analyze_auth.php:9:    'password_verify',
+/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:107:/var/www/tatajestwazny/app/analyze_admin_auth.sh:40:grep -Rin "password_verify" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:134:/var/www/tatajestwazny/app/deploy_auth_module.sh:39:    if (password_verify(\$_POST['password'], \$storedHash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:157:/var/www/tatajestwazny/app/full_auth_debug.sh:17:echo "🔐 2. Test password_verify() w PHP..."
+/var/www/tatajestwazny/app/auth_analysis.log:162:/var/www/tatajestwazny/app/full_auth_debug.sh:28:if (password_verify('$PASSWORD', \$hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:183:/var/www/tatajestwazny/app/fix_auth_php.sh:29:        if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:242:/var/www/tatajestwazny/app/auth_analysis.log:33:/var/www/tatajestwazny/app/public/admin/auth.php:44:    if (password_verify($password, $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:252:/var/www/tatajestwazny/app/auth_analysis.log:43:/var/www/tatajestwazny/app/public/deploy_tjw.sh:382:    if ($u === ADMIN_USER && password_verify($p, ADMIN_PASS_HASH)) {
+/var/www/tatajestwazny/app/auth_analysis.log:258:/var/www/tatajestwazny/app/auth_analysis.log:49:/var/www/tatajestwazny/app/test_auth_env.sh:3:echo "🔍 TEST AUTORYZACJI I ŚRODOWISKA (.env + password_verify + curl)"
+/var/www/tatajestwazny/app/auth_analysis.log:260:/var/www/tatajestwazny/app/auth_analysis.log:51:/var/www/tatajestwazny/app/test_auth_env.sh:13:echo -e "\n🔐 2. Testowanie password_verify w PHP..."
+/var/www/tatajestwazny/app/auth_analysis.log:262:/var/www/tatajestwazny/app/auth_analysis.log:53:/var/www/tatajestwazny/app/test_auth_env.sh:15:PHP_TEST=$(php -r "echo password_verify('Entropia.2025', '$HASH') ? '✅ OK' : '❌ BŁĄD';")
+/var/www/tatajestwazny/app/auth_analysis.log:263:/var/www/tatajestwazny/app/auth_analysis.log:54:/var/www/tatajestwazny/app/test_auth_env.sh:16:echo "Wynik password_verify(): $PHP_TEST"
+/var/www/tatajestwazny/app/auth_analysis.log:265:/var/www/tatajestwazny/app/auth_analysis.log:56:/var/www/tatajestwazny/app/test_auth_env.sh:19:if grep -q "password_verify" public/auth.php; then
+/var/www/tatajestwazny/app/auth_analysis.log:266:/var/www/tatajestwazny/app/auth_analysis.log:57:/var/www/tatajestwazny/app/test_auth_env.sh:20:  echo "✅ password_verify obecne w auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:267:/var/www/tatajestwazny/app/auth_analysis.log:58:/var/www/tatajestwazny/app/test_auth_env.sh:22:  echo "❌ Brak password_verify w auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:286:/var/www/tatajestwazny/app/auth_analysis.log:77:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:39:    if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:295:/var/www/tatajestwazny/app/auth_analysis.log:86:/var/www/tatajestwazny/app/analyze_auth.php:9:    'password_verify',
+/var/www/tatajestwazny/app/auth_analysis.log:314:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:315:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:316:/var/www/tatajestwazny/app/auth_analysis.log:107:/var/www/tatajestwazny/app/analyze_admin_auth.sh:40:grep -Rin "password_verify" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:343:/var/www/tatajestwazny/app/auth_analysis.log:134:/var/www/tatajestwazny/app/deploy_auth_module.sh:39:    if (password_verify(\$_POST['password'], \$storedHash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:366:/var/www/tatajestwazny/app/auth_analysis.log:157:/var/www/tatajestwazny/app/full_auth_debug.sh:17:echo "🔐 2. Test password_verify() w PHP..."
+/var/www/tatajestwazny/app/auth_analysis.log:371:/var/www/tatajestwazny/app/auth_analysis.log:162:/var/www/tatajestwazny/app/full_auth_debug.sh:28:if (password_verify('$PASSWORD', \$hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:392:/var/www/tatajestwazny/app/auth_analysis.log:183:/var/www/tatajestwazny/app/fix_auth_php.sh:29:        if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:462:/var/www/tatajestwazny/app/debug_password_hash.sh:21:PHP_VERIFY=$(php -r "echo password_verify('$TEST_PASS', '$HASH') ? '✅ Hasło OK' : '❌ Hasło NIE PASUJE';")
+/var/www/tatajestwazny/app/auth_analysis.log:463:/var/www/tatajestwazny/app/debug_password_hash.sh:22:echo -e "\n🧪 2. Test password_verify() w PHP:\n$PHP_VERIFY"
+/var/www/tatajestwazny/app/auth_analysis.log:509:/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:24:    if (!password_verify($old, $currentHash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:532:🔍 Szukanie funkcji password_verify / password_hash:
+/var/www/tatajestwazny/app/auth_analysis.log:533:/var/www/tatajestwazny/app/public/admin/auth.php:44:    if (password_verify($password, $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:534:/var/www/tatajestwazny/app/public/deploy_tjw.sh:382:    if ($u === ADMIN_USER && password_verify($p, ADMIN_PASS_HASH)) {
+/var/www/tatajestwazny/app/auth_analysis.log:535:/var/www/tatajestwazny/app/test_auth_env.sh:3:echo "🔍 TEST AUTORYZACJI I ŚRODOWISKA (.env + password_verify + curl)"
+/var/www/tatajestwazny/app/auth_analysis.log:536:/var/www/tatajestwazny/app/test_auth_env.sh:13:echo -e "\n🔐 2. Testowanie password_verify w PHP..."
+/var/www/tatajestwazny/app/auth_analysis.log:537:/var/www/tatajestwazny/app/test_auth_env.sh:15:PHP_TEST=$(php -r "echo password_verify('Entropia.2025', '$HASH') ? '✅ OK' : '❌ BŁĄD';")
+/var/www/tatajestwazny/app/auth_analysis.log:538:/var/www/tatajestwazny/app/test_auth_env.sh:16:echo "Wynik password_verify(): $PHP_TEST"
+/var/www/tatajestwazny/app/auth_analysis.log:539:/var/www/tatajestwazny/app/test_auth_env.sh:19:if grep -q "password_verify" public/auth.php; then
+/var/www/tatajestwazny/app/auth_analysis.log:540:/var/www/tatajestwazny/app/test_auth_env.sh:20:  echo "✅ password_verify obecne w auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:541:/var/www/tatajestwazny/app/test_auth_env.sh:22:  echo "❌ Brak password_verify w auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:542:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:39:    if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:543:/var/www/tatajestwazny/app/analyze_auth.php:9:    'password_verify',
+/var/www/tatajestwazny/app/auth_analysis.log:544:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:545:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:546:/var/www/tatajestwazny/app/analyze_admin_auth.sh:40:grep -Rin "password_verify" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:547:/var/www/tatajestwazny/app/deploy_auth_module.sh:39:    if (password_verify(\$_POST['password'], \$storedHash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:548:/var/www/tatajestwazny/app/full_auth_debug.sh:17:echo "🔐 2. Test password_verify() w PHP..."
+/var/www/tatajestwazny/app/auth_analysis.log:549:/var/www/tatajestwazny/app/full_auth_debug.sh:28:if (password_verify('$PASSWORD', \$hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:550:/var/www/tatajestwazny/app/fix_auth_php.sh:29:        if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:551:/var/www/tatajestwazny/app/auth_analysis.log:33:/var/www/tatajestwazny/app/public/admin/auth.php:44:    if (password_verify($password, $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:552:/var/www/tatajestwazny/app/auth_analysis.log:43:/var/www/tatajestwazny/app/public/deploy_tjw.sh:382:    if ($u === ADMIN_USER && password_verify($p, ADMIN_PASS_HASH)) {
+/var/www/tatajestwazny/app/auth_analysis.log:553:/var/www/tatajestwazny/app/auth_analysis.log:49:/var/www/tatajestwazny/app/test_auth_env.sh:3:echo "🔍 TEST AUTORYZACJI I ŚRODOWISKA (.env + password_verify + curl)"
+/var/www/tatajestwazny/app/auth_analysis.log:554:/var/www/tatajestwazny/app/auth_analysis.log:51:/var/www/tatajestwazny/app/test_auth_env.sh:13:echo -e "\n🔐 2. Testowanie password_verify w PHP..."
+/var/www/tatajestwazny/app/auth_analysis.log:555:/var/www/tatajestwazny/app/auth_analysis.log:53:/var/www/tatajestwazny/app/test_auth_env.sh:15:PHP_TEST=$(php -r "echo password_verify('Entropia.2025', '$HASH') ? '✅ OK' : '❌ BŁĄD';")
+/var/www/tatajestwazny/app/auth_analysis.log:556:/var/www/tatajestwazny/app/auth_analysis.log:54:/var/www/tatajestwazny/app/test_auth_env.sh:16:echo "Wynik password_verify(): $PHP_TEST"
+/var/www/tatajestwazny/app/auth_analysis.log:557:/var/www/tatajestwazny/app/auth_analysis.log:56:/var/www/tatajestwazny/app/test_auth_env.sh:19:if grep -q "password_verify" public/auth.php; then
+/var/www/tatajestwazny/app/auth_analysis.log:558:/var/www/tatajestwazny/app/auth_analysis.log:57:/var/www/tatajestwazny/app/test_auth_env.sh:20:  echo "✅ password_verify obecne w auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:559:/var/www/tatajestwazny/app/auth_analysis.log:58:/var/www/tatajestwazny/app/test_auth_env.sh:22:  echo "❌ Brak password_verify w auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:560:/var/www/tatajestwazny/app/auth_analysis.log:77:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:39:    if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:561:/var/www/tatajestwazny/app/auth_analysis.log:86:/var/www/tatajestwazny/app/analyze_auth.php:9:    'password_verify',
+/var/www/tatajestwazny/app/auth_analysis.log:562:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:563:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:564:/var/www/tatajestwazny/app/auth_analysis.log:107:/var/www/tatajestwazny/app/analyze_admin_auth.sh:40:grep -Rin "password_verify" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:565:/var/www/tatajestwazny/app/auth_analysis.log:134:/var/www/tatajestwazny/app/deploy_auth_module.sh:39:    if (password_verify(\$_POST['password'], \$storedHash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:566:/var/www/tatajestwazny/app/auth_analysis.log:157:/var/www/tatajestwazny/app/full_auth_debug.sh:17:echo "🔐 2. Test password_verify() w PHP..."
+/var/www/tatajestwazny/app/auth_analysis.log:567:/var/www/tatajestwazny/app/auth_analysis.log:162:/var/www/tatajestwazny/app/full_auth_debug.sh:28:if (password_verify('$PASSWORD', \$hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:568:/var/www/tatajestwazny/app/auth_analysis.log:183:/var/www/tatajestwazny/app/fix_auth_php.sh:29:        if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:569:/var/www/tatajestwazny/app/auth_analysis.log:242:/var/www/tatajestwazny/app/auth_analysis.log:33:/var/www/tatajestwazny/app/public/admin/auth.php:44:    if (password_verify($password, $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:570:/var/www/tatajestwazny/app/auth_analysis.log:252:/var/www/tatajestwazny/app/auth_analysis.log:43:/var/www/tatajestwazny/app/public/deploy_tjw.sh:382:    if ($u === ADMIN_USER && password_verify($p, ADMIN_PASS_HASH)) {
+/var/www/tatajestwazny/app/auth_analysis.log:571:/var/www/tatajestwazny/app/auth_analysis.log:258:/var/www/tatajestwazny/app/auth_analysis.log:49:/var/www/tatajestwazny/app/test_auth_env.sh:3:echo "🔍 TEST AUTORYZACJI I ŚRODOWISKA (.env + password_verify + curl)"
+/var/www/tatajestwazny/app/auth_analysis.log:572:/var/www/tatajestwazny/app/auth_analysis.log:260:/var/www/tatajestwazny/app/auth_analysis.log:51:/var/www/tatajestwazny/app/test_auth_env.sh:13:echo -e "\n🔐 2. Testowanie password_verify w PHP..."
+/var/www/tatajestwazny/app/auth_analysis.log:573:/var/www/tatajestwazny/app/auth_analysis.log:262:/var/www/tatajestwazny/app/auth_analysis.log:53:/var/www/tatajestwazny/app/test_auth_env.sh:15:PHP_TEST=$(php -r "echo password_verify('Entropia.2025', '$HASH') ? '✅ OK' : '❌ BŁĄD';")
+/var/www/tatajestwazny/app/auth_analysis.log:574:/var/www/tatajestwazny/app/auth_analysis.log:263:/var/www/tatajestwazny/app/auth_analysis.log:54:/var/www/tatajestwazny/app/test_auth_env.sh:16:echo "Wynik password_verify(): $PHP_TEST"
+/var/www/tatajestwazny/app/auth_analysis.log:575:/var/www/tatajestwazny/app/auth_analysis.log:265:/var/www/tatajestwazny/app/auth_analysis.log:56:/var/www/tatajestwazny/app/test_auth_env.sh:19:if grep -q "password_verify" public/auth.php; then
+/var/www/tatajestwazny/app/auth_analysis.log:576:/var/www/tatajestwazny/app/auth_analysis.log:266:/var/www/tatajestwazny/app/auth_analysis.log:57:/var/www/tatajestwazny/app/test_auth_env.sh:20:  echo "✅ password_verify obecne w auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:577:/var/www/tatajestwazny/app/auth_analysis.log:267:/var/www/tatajestwazny/app/auth_analysis.log:58:/var/www/tatajestwazny/app/test_auth_env.sh:22:  echo "❌ Brak password_verify w auth.php"
+/var/www/tatajestwazny/app/auth_analysis.log:578:/var/www/tatajestwazny/app/auth_analysis.log:286:/var/www/tatajestwazny/app/auth_analysis.log:77:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:39:    if (password_verify($_POST['password'], $hash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:579:/var/www/tatajestwazny/app/auth_analysis.log:295:/var/www/tatajestwazny/app/auth_analysis.log:86:/var/www/tatajestwazny/app/analyze_auth.php:9:    'password_verify',
+/var/www/tatajestwazny/app/auth_analysis.log:580:/var/www/tatajestwazny/app/auth_analysis.log:314:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:581:/var/www/tatajestwazny/app/auth_analysis.log:315:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:582:/var/www/tatajestwazny/app/auth_analysis.log:316:/var/www/tatajestwazny/app/auth_analysis.log:107:/var/www/tatajestwazny/app/analyze_admin_auth.sh:40:grep -Rin "password_verify" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:583:/var/www/tatajestwazny/app/auth_analysis.log:343:/var/www/tatajestwazny/app/auth_analysis.log:134:/var/www/tatajestwazny/app/deploy_auth_module.sh:39:    if (password_verify(\$_POST['password'], \$storedHash)) {
+/var/www/tatajestwazny/app/auth_analysis.log:584:/var/www/tatajestwazny/app/auth_analysis.log:366:/var/www/tatajestwazny/app/auth_analysis.log:157:/var/www/tatajestwazny/app/full_auth_debug.sh:17:echo "🔐 2. Test password_verify() w PHP..."
+/var/www/tatajestwazny/app/auth_analysis.log:585:/var/www/tatajestwazny/app/auth_analysis.log:371:/var/www/tatajestwazny/app/auth_analysis.log:162:/var/www/tatajestwazny/app/full_auth_debug.sh:28:if (password_verify('$PASSWORD', \$hash)) 
+/var/www/tatajestwazny/app/debug_password_hash.sh:21:PHP_VERIFY=$(php -r "echo password_verify('$TEST_PASS', '$HASH') ? '✅ Hasło OK' : '❌ Hasło NIE PASUJE';")
+/var/www/tatajestwazny/app/debug_password_hash.sh:22:echo -e "\n🧪 2. Test password_verify() w PHP:\n$PHP_VERIFY"
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:24:    if (!password_verify($old, $currentHash)) {
+/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/test_auth_env.sh:10:  grep AUTH_PASSWORD_HASH .env || echo "❌ Brak AUTH_PASSWORD_HASH w .env"
+/var/www/tatajestwazny/app/test_auth_env.sh:14:HASH=$(grep AUTH_PASSWORD_HASH .env | cut -d'=' -f2 | tr -d '"')
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:20:  HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:21:  echo "AUTH_PASSWORD_HASH='$HASH'" > "$ENV_FILE"
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:31:$hash = getenv('AUTH_PASSWORD_HASH') ?: (getenv('AUTH_PASSWORD_HASH') ?? '');
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:34:  die('❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:119:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/analyze_auth.php:10:    'password_hash',
+/var/www/tatajestwazny/app/analyze_auth.php:53:        echo "   docker exec -it tjw_php php -r 'echo password_hash(\"NOWE_HASLO\", PASSWORD_BCRYPT).\"\\n\";'\n";
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/analyze_admin_auth.sh:41:grep -Rin "password_hash" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/deploy_auth_module.sh:8:HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/deploy_auth_module.sh:9:echo "AUTH_PASSWORD_HASH=\"$HASH\"" > .env
+/var/www/tatajestwazny/app/deploy_auth_module.sh:35:\$storedHash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/deploy_auth_module.sh:116:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/full_auth_debug.sh:13:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env || echo "❌ Brak zmiennej AUTH_PASSWORD_HASH")
+/var/www/tatajestwazny/app/full_auth_debug.sh:19:\$hash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/full_auth_debug.sh:23:        if (strpos(\$line, 'AUTH_PASSWORD_HASH=') === 0) {
+/var/www/tatajestwazny/app/fix_auth_php.sh:25:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/auth_analysis.log:18:/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/auth_analysis.log:19:/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/auth_analysis.log:26:/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:28:/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/auth_analysis.log:50:/var/www/tatajestwazny/app/test_auth_env.sh:10:  grep AUTH_PASSWORD_HASH .env || echo "❌ Brak AUTH_PASSWORD_HASH w .env"
+/var/www/tatajestwazny/app/auth_analysis.log:52:/var/www/tatajestwazny/app/test_auth_env.sh:14:HASH=$(grep AUTH_PASSWORD_HASH .env | cut -d'=' -f2 | tr -d '"')
+/var/www/tatajestwazny/app/auth_analysis.log:69:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:20:  HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:70:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:21:  echo "AUTH_PASSWORD_HASH='$HASH'" > "$ENV_FILE"
+/var/www/tatajestwazny/app/auth_analysis.log:74:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:31:$hash = getenv('AUTH_PASSWORD_HASH') ?: (getenv('AUTH_PASSWORD_HASH') ?? '');
+/var/www/tatajestwazny/app/auth_analysis.log:76:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:34:  die('❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:81:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:119:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:87:/var/www/tatajestwazny/app/analyze_auth.php:10:    'password_hash',
+/var/www/tatajestwazny/app/auth_analysis.log:94:/var/www/tatajestwazny/app/analyze_auth.php:53:        echo "   docker exec -it tjw_php php -r 'echo password_hash(\"NOWE_HASLO\", PASSWORD_BCRYPT).\"\\n\";'\n";
+/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:108:/var/www/tatajestwazny/app/analyze_admin_auth.sh:41:grep -Rin "password_hash" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:128:/var/www/tatajestwazny/app/deploy_auth_module.sh:8:HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:129:/var/www/tatajestwazny/app/deploy_auth_module.sh:9:echo "AUTH_PASSWORD_HASH=\"$HASH\"" > .env
+/var/www/tatajestwazny/app/auth_analysis.log:133:/var/www/tatajestwazny/app/deploy_auth_module.sh:35:\$storedHash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:138:/var/www/tatajestwazny/app/deploy_auth_module.sh:116:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:155:/var/www/tatajestwazny/app/full_auth_debug.sh:13:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env || echo "❌ Brak zmiennej AUTH_PASSWORD_HASH")
+/var/www/tatajestwazny/app/auth_analysis.log:158:/var/www/tatajestwazny/app/full_auth_debug.sh:19:\$hash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:160:/var/www/tatajestwazny/app/full_auth_debug.sh:23:        if (strpos(\$line, 'AUTH_PASSWORD_HASH=') === 0) {
+/var/www/tatajestwazny/app/auth_analysis.log:181:/var/www/tatajestwazny/app/fix_auth_php.sh:25:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/auth_analysis.log:227:/var/www/tatajestwazny/app/auth_analysis.log:18:/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/auth_analysis.log:228:/var/www/tatajestwazny/app/auth_analysis.log:19:/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/auth_analysis.log:235:/var/www/tatajestwazny/app/auth_analysis.log:26:/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:237:/var/www/tatajestwazny/app/auth_analysis.log:28:/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/auth_analysis.log:259:/var/www/tatajestwazny/app/auth_analysis.log:50:/var/www/tatajestwazny/app/test_auth_env.sh:10:  grep AUTH_PASSWORD_HASH .env || echo "❌ Brak AUTH_PASSWORD_HASH w .env"
+/var/www/tatajestwazny/app/auth_analysis.log:261:/var/www/tatajestwazny/app/auth_analysis.log:52:/var/www/tatajestwazny/app/test_auth_env.sh:14:HASH=$(grep AUTH_PASSWORD_HASH .env | cut -d'=' -f2 | tr -d '"')
+/var/www/tatajestwazny/app/auth_analysis.log:278:/var/www/tatajestwazny/app/auth_analysis.log:69:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:20:  HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:279:/var/www/tatajestwazny/app/auth_analysis.log:70:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:21:  echo "AUTH_PASSWORD_HASH='$HASH'" > "$ENV_FILE"
+/var/www/tatajestwazny/app/auth_analysis.log:283:/var/www/tatajestwazny/app/auth_analysis.log:74:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:31:$hash = getenv('AUTH_PASSWORD_HASH') ?: (getenv('AUTH_PASSWORD_HASH') ?? '');
+/var/www/tatajestwazny/app/auth_analysis.log:285:/var/www/tatajestwazny/app/auth_analysis.log:76:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:34:  die('❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:290:/var/www/tatajestwazny/app/auth_analysis.log:81:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:119:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:296:/var/www/tatajestwazny/app/auth_analysis.log:87:/var/www/tatajestwazny/app/analyze_auth.php:10:    'password_hash',
+/var/www/tatajestwazny/app/auth_analysis.log:303:/var/www/tatajestwazny/app/auth_analysis.log:94:/var/www/tatajestwazny/app/analyze_auth.php:53:        echo "   docker exec -it tjw_php php -r 'echo password_hash(\"NOWE_HASLO\", PASSWORD_BCRYPT).\"\\n\";'\n";
+/var/www/tatajestwazny/app/auth_analysis.log:314:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:315:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:317:/var/www/tatajestwazny/app/auth_analysis.log:108:/var/www/tatajestwazny/app/analyze_admin_auth.sh:41:grep -Rin "password_hash" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:337:/var/www/tatajestwazny/app/auth_analysis.log:128:/var/www/tatajestwazny/app/deploy_auth_module.sh:8:HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:338:/var/www/tatajestwazny/app/auth_analysis.log:129:/var/www/tatajestwazny/app/deploy_auth_module.sh:9:echo "AUTH_PASSWORD_HASH=\"$HASH\"" > .env
+/var/www/tatajestwazny/app/auth_analysis.log:342:/var/www/tatajestwazny/app/auth_analysis.log:133:/var/www/tatajestwazny/app/deploy_auth_module.sh:35:\$storedHash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:347:/var/www/tatajestwazny/app/auth_analysis.log:138:/var/www/tatajestwazny/app/deploy_auth_module.sh:116:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:364:/var/www/tatajestwazny/app/auth_analysis.log:155:/var/www/tatajestwazny/app/full_auth_debug.sh:13:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env || echo "❌ Brak zmiennej AUTH_PASSWORD_HASH")
+/var/www/tatajestwazny/app/auth_analysis.log:367:/var/www/tatajestwazny/app/auth_analysis.log:158:/var/www/tatajestwazny/app/full_auth_debug.sh:19:\$hash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:369:/var/www/tatajestwazny/app/auth_analysis.log:160:/var/www/tatajestwazny/app/full_auth_debug.sh:23:        if (strpos(\$line, 'AUTH_PASSWORD_HASH=') === 0) {
+/var/www/tatajestwazny/app/auth_analysis.log:390:/var/www/tatajestwazny/app/auth_analysis.log:181:/var/www/tatajestwazny/app/fix_auth_php.sh:25:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/auth_analysis.log:436:/var/www/tatajestwazny/app/auth_analysis.log:227:/var/www/tatajestwazny/app/auth_analysis.log:18:/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/auth_analysis.log:437:/var/www/tatajestwazny/app/auth_analysis.log:228:/var/www/tatajestwazny/app/auth_analysis.log:19:/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/auth_analysis.log:444:/var/www/tatajestwazny/app/auth_analysis.log:235:/var/www/tatajestwazny/app/auth_analysis.log:26:/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:446:/var/www/tatajestwazny/app/auth_analysis.log:237:/var/www/tatajestwazny/app/auth_analysis.log:28:/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/auth_analysis.log:451:/var/www/tatajestwazny/app/debug_password_hash.sh:3:echo "🔍 DEBUG HASHOWANIA HASŁA (reset_admin_password.sh, .env, PHP)"
+/var/www/tatajestwazny/app/auth_analysis.log:452:/var/www/tatajestwazny/app/debug_password_hash.sh:5:# 1. Wyciągnij hash z pliku .env
+/var/www/tatajestwazny/app/auth_analysis.log:453:/var/www/tatajestwazny/app/debug_password_hash.sh:6:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env)
+/var/www/tatajestwazny/app/auth_analysis.log:454:/var/www/tatajestwazny/app/debug_password_hash.sh:7:HASH=$(echo "$HASH_LINE" | cut -d'=' -f2- | tr -d '"')
+/var/www/tatajestwazny/app/auth_analysis.log:455:/var/www/tatajestwazny/app/debug_password_hash.sh:9:echo -e "\n🔐 1. Wczytany hash z .env:"
+/var/www/tatajestwazny/app/auth_analysis.log:456:/var/www/tatajestwazny/app/debug_password_hash.sh:10:echo "$HASH"
+/var/www/tatajestwazny/app/auth_analysis.log:457:/var/www/tatajestwazny/app/debug_password_hash.sh:12:# 2. Czy wygląda jak poprawny bcrypt?
+/var/www/tatajestwazny/app/auth_analysis.log:458:/var/www/tatajestwazny/app/debug_password_hash.sh:13:if [[ $HASH =~ ^\$2[aby]?\$[0-9]{2}\$.*$ ]]; then
+/var/www/tatajestwazny/app/auth_analysis.log:459:/var/www/tatajestwazny/app/debug_password_hash.sh:14:  echo "✅ Format hash wygląda poprawnie (bcrypt)"
+/var/www/tatajestwazny/app/auth_analysis.log:460:/var/www/tatajestwazny/app/debug_password_hash.sh:16:  echo "❌ Format nie wygląda jak poprawny hash bcrypt!"
+/var/www/tatajestwazny/app/auth_analysis.log:461:/var/www/tatajestwazny/app/debug_password_hash.sh:19:# 3. Test manualnego hashowania
+/var/www/tatajestwazny/app/auth_analysis.log:462:/var/www/tatajestwazny/app/debug_password_hash.sh:21:PHP_VERIFY=$(php -r "echo password_verify('$TEST_PASS', '$HASH') ? '✅ Hasło OK' : '❌ Hasło NIE PASUJE';")
+/var/www/tatajestwazny/app/auth_analysis.log:463:/var/www/tatajestwazny/app/debug_password_hash.sh:22:echo -e "\n🧪 2. Test password_verify() w PHP:\n$PHP_VERIFY"
+/var/www/tatajestwazny/app/auth_analysis.log:464:/var/www/tatajestwazny/app/debug_password_hash.sh:24:# 4. Dodatkowo spróbuj hashować i porównać
+/var/www/tatajestwazny/app/auth_analysis.log:465:/var/www/tatajestwazny/app/debug_password_hash.sh:25:NEW_HASH=$(php -r "echo password_hash('$TEST_PASS', PASSWORD_BCRYPT);")
+/var/www/tatajestwazny/app/auth_analysis.log:466:/var/www/tatajestwazny/app/debug_password_hash.sh:26:echo -e "\n🔁 3. Nowy hash tego samego hasła (dla porównania):"
+/var/www/tatajestwazny/app/auth_analysis.log:467:/var/www/tatajestwazny/app/debug_password_hash.sh:27:echo "$NEW_HASH"
+/var/www/tatajestwazny/app/auth_analysis.log:468:/var/www/tatajestwazny/app/debug_password_hash.sh:30:echo -e "\n🌍 4. Sprawdzenie dostępności AUTH_PASSWORD_HASH przez PHP (getenv + $_ENV):"
+/var/www/tatajestwazny/app/auth_analysis.log:469:/var/www/tatajestwazny/app/debug_password_hash.sh:32:\$env = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:470:/var/www/tatajestwazny/app/debug_password_hash.sh:33:\$superglobal = \$_ENV['AUTH_PASSWORD_HASH'] ?? null;
+/var/www/tatajestwazny/app/auth_analysis.log:471:/var/www/tatajestwazny/app/debug_password_hash.sh:38:# 6. Szybka walidacja auth.php jeśli istnieje
+/var/www/tatajestwazny/app/auth_analysis.log:472:/var/www/tatajestwazny/app/debug_password_hash.sh:39:if [[ -f public/auth.php ]]; then
+/var/www/tatajestwazny/app/auth_analysis.log:473:/var/www/tatajestwazny/app/debug_password_hash.sh:40:  echo -e "\n📄 5. Sprawdzenie, czy auth.php ładuje .env..."
+/var/www/tatajestwazny/app/auth_analysis.log:474:/var/www/tatajestwazny/app/debug_password_hash.sh:41:  if grep -q "AUTH_PASSWORD_HASH" public/auth.php; then
+/var/www/tatajestwazny/app/auth_analysis.log:475:/var/www/tatajestwazny/app/debug_password_hash.sh:42:    echo "✅ auth.php używa AUTH_PASSWORD_HASH"
+/var/www/tatajestwazny/app/auth_analysis.log:476:/var/www/tatajestwazny/app/debug_password_hash.sh:44:    echo "❌ auth.php nie używa AUTH_PASSWORD_HASH!"
+/var/www/tatajestwazny/app/auth_analysis.log:477:/var/www/tatajestwazny/app/debug_password_hash.sh:49:echo "🔧 Jeśli chcesz naprawić, uruchom ponownie: ./reset_admin_password.sh"
+/var/www/tatajestwazny/app/auth_analysis.log:494:/var/www/tatajestwazny/app/reset_admin_password.sh:102:hash=$(php -r 'echo password_hash($argv[1], PASSWORD_DEFAULT);' "$password")
+/var/www/tatajestwazny/app/auth_analysis.log:497:/var/www/tatajestwazny/app/reset_admin_password.sh:106:  echo "AUTH_PASSWORD_HASH=\"$hash\""
+/var/www/tatajestwazny/app/auth_analysis.log:498:/var/www/tatajestwazny/app/reset_admin_password.sh:121:if grep -q '^AUTH_PASSWORD_HASH=' "$new_tmp"; then
+/var/www/tatajestwazny/app/auth_analysis.log:499:/var/www/tatajestwazny/app/reset_admin_password.sh:122:  sed -i "s|^AUTH_PASSWORD_HASH=.*|AUTH_PASSWORD_HASH=\"$hash\"|" "$new_tmp"
+/var/www/tatajestwazny/app/auth_analysis.log:500:/var/www/tatajestwazny/app/reset_admin_password.sh:130:  printf 'AUTH_PASSWORD_HASH="%s"\n' "$hash" >>"$new_tmp"
+/var/www/tatajestwazny/app/auth_analysis.log:505:/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:17:$currentHash = $envVars['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/auth_analysis.log:510:/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:31:        $newHash = password_hash($new, PASSWORD_DEFAULT);
+/var/www/tatajestwazny/app/auth_analysis.log:511:/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:34:            if (str_starts_with($line, 'AUTH_PASSWORD_HASH=')) {
+/var/www/tatajestwazny/app/auth_analysis.log:512:/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:35:                $line = "AUTH_PASSWORD_HASH=\"$newHash\"\n";
+/var/www/tatajestwazny/app/auth_analysis.log:532:🔍 Szukanie funkcji password_verify / password_hash:
+/var/www/tatajestwazny/app/auth_analysis.log:544:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:545:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:562:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:563:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:580:/var/www/tatajestwazny/app/auth_analysis.log:314:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:581:/var/www/tatajestwazny/app/auth_analysis.log:315:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:587:/var/www/tatajestwazny/app/auth_analysis.log:462:/var/www/tatajestwazny/app/debug_password_hash.sh:21:PHP_VERIFY=$(php -r "echo password_verify('$TEST_PASS', '$HASH') ? '✅ Hasło OK' : '❌ Hasło NIE PASUJE';")
+/var/www/tatajestwazny/app/auth_analysis.log:588:/var/www/tatajestwazny/app/auth_analysis.log:463:/var/www/tatajestwazny/app/debug_password_hash.sh:22:echo -e "\n🧪 2. Test password_verify() w PHP:\n$PHP_VERIFY"
+/var/www/tatajestwazny/app/auth_analysis.log:590:/var/www/tatajestwazny/app/auth_analysis.log:532:🔍 Szukanie funkcji password_verify / password_hash:
+/var/www/tatajestwazny/app/auth_analysis.log:602:/var/www/tatajestwazny/app/auth_analysis.log:544:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:603:/var/www/tatajestwazny/app/auth_analysis.log:545:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:620:/var/www/tatajestwazny/app/auth_analysis.log:562:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:621:/var/www/tatajestwazny/app/auth_analysis.log:563:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:638:/var/www/tatajestwazny/app/auth_analysis.log:580:/var/www/tatajestwazny/app/auth_analysis.log:314:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:639:/var/www/tatajestwazny/app/auth_analysis.log:581:/var/www/tatajestwazny/app/auth_analysis.log:315:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:644:/var/www/tatajestwazny/app/debug_password_hash.sh:21:PHP_VERIFY=$(php -r "echo password_verify('$TEST_PASS', '$HASH') ? '✅ Hasło OK' : '❌ Hasło NIE PASUJE';")
+/var/www/tatajestwazny/app/auth_analysis.log:645:/var/www/tatajestwazny/app/debug_password_hash.sh:22:echo -e "\n🧪 2. Test password_verify() w PHP:\n$PHP_VERIFY"
+/var/www/tatajestwazny/app/auth_analysis.log:647:/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/auth_analysis.log:648:/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/auth_analysis.log:649:/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:650:/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/auth_analysis.log:651:/var/www/tatajestwazny/app/test_auth_env.sh:10:  grep AUTH_PASSWORD_HASH .env || echo "❌ Brak AUTH_PASSWORD_HASH w .env"
+/var/www/tatajestwazny/app/auth_analysis.log:652:/var/www/tatajestwazny/app/test_auth_env.sh:14:HASH=$(grep AUTH_PASSWORD_HASH .env | cut -d'=' -f2 | tr -d '"')
+/var/www/tatajestwazny/app/auth_analysis.log:653:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:20:  HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:654:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:21:  echo "AUTH_PASSWORD_HASH='$HASH'" > "$ENV_FILE"
+/var/www/tatajestwazny/app/auth_analysis.log:655:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:31:$hash = getenv('AUTH_PASSWORD_HASH') ?: (getenv('AUTH_PASSWORD_HASH') ?? '');
+/var/www/tatajestwazny/app/auth_analysis.log:656:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:34:  die('❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:657:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:119:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:658:/var/www/tatajestwazny/app/analyze_auth.php:10:    'password_hash',
+/var/www/tatajestwazny/app/auth_analysis.log:659:/var/www/tatajestwazny/app/analyze_auth.php:53:        echo "   docker exec -it tjw_php php -r 'echo password_hash(\"NOWE_HASLO\", PASSWORD_BCRYPT).\"\\n\";'\n";
+/var/www/tatajestwazny/app/auth_analysis.log:660:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:661:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:662:/var/www/tatajestwazny/app/analyze_admin_auth.sh:41:grep -Rin "password_hash" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:663:/var/www/tatajestwazny/app/deploy_auth_module.sh:8:HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:664:/var/www/tatajestwazny/app/deploy_auth_module.sh:9:echo "AUTH_PASSWORD_HASH=\"$HASH\"" > .env
+/var/www/tatajestwazny/app/auth_analysis.log:665:/var/www/tatajestwazny/app/deploy_auth_module.sh:35:\$storedHash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:666:/var/www/tatajestwazny/app/deploy_auth_module.sh:116:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:667:/var/www/tatajestwazny/app/full_auth_debug.sh:13:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env || echo "❌ Brak zmiennej AUTH_PASSWORD_HASH")
+/var/www/tatajestwazny/app/auth_analysis.log:668:/var/www/tatajestwazny/app/full_auth_debug.sh:19:\$hash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:669:/var/www/tatajestwazny/app/full_auth_debug.sh:23:        if (strpos(\$line, 'AUTH_PASSWORD_HASH=') === 0) {
+/var/www/tatajestwazny/app/auth_analysis.log:670:/var/www/tatajestwazny/app/fix_auth_php.sh:25:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/auth_analysis.log:671:/var/www/tatajestwazny/app/auth_analysis.log:18:/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/auth_analysis.log:672:/var/www/tatajestwazny/app/auth_analysis.log:19:/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/auth_analysis.log:673:/var/www/tatajestwazny/app/auth_analysis.log:26:/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:674:/var/www/tatajestwazny/app/auth_analysis.log:28:/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/auth_analysis.log:675:/var/www/tatajestwazny/app/auth_analysis.log:50:/var/www/tatajestwazny/app/test_auth_env.sh:10:  grep AUTH_PASSWORD_HASH .env || echo "❌ Brak AUTH_PASSWORD_HASH w .env"
+/var/www/tatajestwazny/app/auth_analysis.log:676:/var/www/tatajestwazny/app/auth_analysis.log:52:/var/www/tatajestwazny/app/test_auth_env.sh:14:HASH=$(grep AUTH_PASSWORD_HASH .env | cut -d'=' -f2 | tr -d '"')
+/var/www/tatajestwazny/app/auth_analysis.log:677:/var/www/tatajestwazny/app/auth_analysis.log:69:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:20:  HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:678:/var/www/tatajestwazny/app/auth_analysis.log:70:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:21:  echo "AUTH_PASSWORD_HASH='$HASH'" > "$ENV_FILE"
+/var/www/tatajestwazny/app/auth_analysis.log:679:/var/www/tatajestwazny/app/auth_analysis.log:74:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:31:$hash = getenv('AUTH_PASSWORD_HASH') ?: (getenv('AUTH_PASSWORD_HASH') ?? '');
+/var/www/tatajestwazny/app/auth_analysis.log:680:/var/www/tatajestwazny/app/auth_analysis.log:76:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:34:  die('❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:681:/var/www/tatajestwazny/app/auth_analysis.log:81:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:119:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:682:/var/www/tatajestwazny/app/auth_analysis.log:87:/var/www/tatajestwazny/app/analyze_auth.php:10:    'password_hash',
+/var/www/tatajestwazny/app/auth_analysis.log:683:/var/www/tatajestwazny/app/auth_analysis.log:94:/var/www/tatajestwazny/app/analyze_auth.php:53:        echo "   docker exec -it tjw_php php -r 'echo password_hash(\"NOWE_HASLO\", PASSWORD_BCRYPT).\"\\n\";'\n";
+/var/www/tatajestwazny/app/auth_analysis.log:684:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:685:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:686:/var/www/tatajestwazny/app/auth_analysis.log:108:/var/www/tatajestwazny/app/analyze_admin_auth.sh:41:grep -Rin "password_hash" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:687:/var/www/tatajestwazny/app/auth_analysis.log:128:/var/www/tatajestwazny/app/deploy_auth_module.sh:8:HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:688:/var/www/tatajestwazny/app/auth_analysis.log:129:/var/www/tatajestwazny/app/deploy_auth_module.sh:9:echo "AUTH_PASSWORD_HASH=\"$HASH\"" > .env
+/var/www/tatajestwazny/app/auth_analysis.log:689:/var/www/tatajestwazny/app/auth_analysis.log:133:/var/www/tatajestwazny/app/deploy_auth_module.sh:35:\$storedHash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:690:/var/www/tatajestwazny/app/auth_analysis.log:138:/var/www/tatajestwazny/app/deploy_auth_module.sh:116:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:691:/var/www/tatajestwazny/app/auth_analysis.log:155:/var/www/tatajestwazny/app/full_auth_debug.sh:13:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env || echo "❌ Brak zmiennej AUTH_PASSWORD_HASH")
+/var/www/tatajestwazny/app/auth_analysis.log:692:/var/www/tatajestwazny/app/auth_analysis.log:158:/var/www/tatajestwazny/app/full_auth_debug.sh:19:\$hash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:693:/var/www/tatajestwazny/app/auth_analysis.log:160:/var/www/tatajestwazny/app/full_auth_debug.sh:23:        if (strpos(\$line, 'AUTH_PASSWORD_HASH=') === 0) {
+/var/www/tatajestwazny/app/auth_analysis.log:694:/var/www/tatajestwazny/app/auth_analysis.log:181:/var/www/tatajestwazny/app/fix_auth_php.sh:25:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/auth_analysis.log:695:/var/www/tatajestwazny/app/auth_analysis.log:227:/var/www/tatajestwazny/app/auth_analysis.log:18:/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/auth_analysis.log:696:/var/www/tatajestwazny/app/auth_analysis.log:228:/var/www/tatajestwazny/app/auth_analysis.log:19:/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/auth_analysis.log:697:/var/www/tatajestwazny/app/auth_analysis.log:235:/var/www/tatajestwazny/app/auth_analysis.log:26:/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:698:/var/www/tatajestwazny/app/auth_analysis.log:237:/var/www/tatajestwazny/app/auth_analysis.log:28:/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/auth_analysis.log:699:/var/www/tatajestwazny/app/auth_analysis.log:259:/var/www/tatajestwazny/app/auth_analysis.log:50:/var/www/tatajestwazny/app/test_auth_env.sh:10:  grep AUTH_PASSWORD_HASH .env || echo "❌ Brak AUTH_PASSWORD_HASH w .env"
+/var/www/tatajestwazny/app/auth_analysis.log:700:/var/www/tatajestwazny/app/auth_analysis.log:261:/var/www/tatajestwazny/app/auth_analysis.log:52:/var/www/tatajestwazny/app/test_auth_env.sh:14:HASH=$(grep AUTH_PASSWORD_HASH .env | cut -d'=' -f2 | tr -d '"')
+/var/www/tatajestwazny/app/auth_analysis.log:701:/var/www/tatajestwazny/app/auth_analysis.log:278:/var/www/tatajestwazny/app/auth_analysis.log:69:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:20:  HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:702:/var/www/tatajestwazny/app/auth_analysis.log:279:/var/www/tatajestwazny/app/auth_analysis.log:70:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:21:  echo "AUTH_PASSWORD_HASH='$HASH'" > "$ENV_FILE"
+/var/www/tatajestwazny/app/auth_analysis.log:703:/var/www/tatajestwazny/app/auth_analysis.log:283:/var/www/tatajestwazny/app/auth_analysis.log:74:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:31:$hash = getenv('AUTH_PASSWORD_HASH') ?: (getenv('AUTH_PASSWORD_HASH') ?? '');
+/var/www/tatajestwazny/app/auth_analysis.log:704:/var/www/tatajestwazny/app/auth_analysis.log:285:/var/www/tatajestwazny/app/auth_analysis.log:76:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:34:  die('❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:705:/var/www/tatajestwazny/app/auth_analysis.log:290:/var/www/tatajestwazny/app/auth_analysis.log:81:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:119:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:706:/var/www/tatajestwazny/app/auth_analysis.log:296:/var/www/tatajestwazny/app/auth_analysis.log:87:/var/www/tatajestwazny/app/analyze_auth.php:10:    'password_hash',
+/var/www/tatajestwazny/app/auth_analysis.log:707:/var/www/tatajestwazny/app/auth_analysis.log:303:/var/www/tatajestwazny/app/auth_analysis.log:94:/var/www/tatajestwazny/app/analyze_auth.php:53:        echo "   docker exec -it tjw_php php -r 'echo password_hash(\"NOWE_HASLO\", PASSWORD_BCRYPT).\"\\n\";'\n";
+/var/www/tatajestwazny/app/auth_analysis.log:708:/var/www/tatajestwazny/app/auth_analysis.log:314:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:709:/var/www/tatajestwazny/app/auth_analysis.log:315:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:710:/var/www/tatajestwazny/app/auth_analysis.log:317:/var/www/tatajestwazny/app/auth_analysis.log:108:/var/www/tatajestwazny/app/analyze_admin_auth.sh:41:grep -Rin "password_hash" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:711:/var/www/tatajestwazny/app/auth_analysis.log:337:/var/www/tatajestwazny/app/auth_analysis.log:128:/var/www/tatajestwazny/app/deploy_auth_module.sh:8:HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:712:/var/www/tatajestwazny/app/auth_analysis.log:338:/var/www/tatajestwazny/app/auth_analysis.log:129:/var/www/tatajestwazny/app/deploy_auth_module.sh:9:echo "AUTH_PASSWORD_HASH=\"$HASH\"" > .env
+/var/www/tatajestwazny/app/auth_analysis.log:713:/var/www/tatajestwazny/app/auth_analysis.log:342:/var/www/tatajestwazny/app/auth_analysis.log:133:/var/www/tatajestwazny/app/deploy_auth_module.sh:35:\$storedHash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:714:/var/www/tatajestwazny/app/auth_analysis.log:347:/var/www/tatajestwazny/app/auth_analysis.log:138:/var/www/tatajestwazny/app/deploy_auth_module.sh:116:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:715:/var/www/tatajestwazny/app/auth_analysis.log:364:/var/www/tatajestwazny/app/auth_analysis.log:155:/var/www/tatajestwazny/app/full_auth_debug.sh:13:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env || echo "❌ Brak zmiennej AUTH_PASSWORD_HASH")
+/var/www/tatajestwazny/app/auth_analysis.log:716:/var/www/tatajestwazny/app/auth_analysis.log:367:/var/www/tatajestwazny/app/auth_analysis.log:158:/var/www/tatajestwazny/app/full_auth_debug.sh:19:\$hash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:717:/var/www/tatajestwazny/app/auth_analysis.log:369:/var/www/tatajestwazny/app/auth_analysis.log:160:/var/www/tatajestwazny/app/full_auth_debug.sh:23:        if (strpos(\$line, 'AUTH_PASSWORD_HASH=') === 0) {
+/var/www/tatajestwazny/app/auth_analysis.log:718:/var/www/tatajestwazny/app/auth_analysis.log:390:/var/www/tatajestwazny/app/auth_analysis.log:181:/var/www/tatajestwazny/app/fix_auth_php.sh:25:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/auth_analysis.log:719:/var/www/tatajestwazny/app/auth_analysis.log:436:/var/www/tatajestwazny/app/auth_analysis.log:227:/var/www/tatajestwazny/app/auth_analysis.log:18:/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/auth_analysis.log:720:/var/www/tatajestwazny/app/auth_analysis.log:437:/var/www/tatajestwazny/app/auth_analysis.log:228:/var/www/tatajestwazny/app/auth_analysis.log:19:/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/auth_analysis.log:721:/var/www/tatajestwazny/app/auth_analysis.log:444:/var/www/tatajestwazny/app/auth_analysis.log:235:/var/www/tatajestwazny/app/auth_analysis.log:26:/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:722:/var/www/tatajestwazny/app/auth_analysis.log:446:/var/www/tatajestwazny/app/auth_analysis.log:237:/var/www/tatajestwazny/app/auth_analysis.log:28:/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/auth_analysis.log:723:/var/www/tatajestwazny/app/auth_analysis.log:451:/var/www/tatajestwazny/app/debug_password_hash.sh:3:echo "🔍 DEBUG HASHOWANIA HASŁA (reset_admin_password.sh, .env, PHP)"
+/var/www/tatajestwazny/app/auth_analysis.log:724:/var/www/tatajestwazny/app/auth_analysis.log:452:/var/www/tatajestwazny/app/debug_password_hash.sh:5:# 1. Wyciągnij hash z pliku .env
+/var/www/tatajestwazny/app/auth_analysis.log:725:/var/www/tatajestwazny/app/auth_analysis.log:453:/var/www/tatajestwazny/app/debug_password_hash.sh:6:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env)
+/var/www/tatajestwazny/app/auth_analysis.log:726:/var/www/tatajestwazny/app/auth_analysis.log:454:/var/www/tatajestwazny/app/debug_password_hash.sh:7:HASH=$(echo "$HASH_LINE" | cut -d'=' -f2- | tr -d '"')
+/var/www/tatajestwazny/app/auth_analysis.log:727:/var/www/tatajestwazny/app/auth_analysis.log:455:/var/www/tatajestwazny/app/debug_password_hash.sh:9:echo -e "\n🔐 1. Wczytany hash z .env:"
+/var/www/tatajestwazny/app/auth_analysis.log:728:/var/www/tatajestwazny/app/auth_analysis.log:456:/var/www/tatajestwazny/app/debug_password_hash.sh:10:echo "$HASH"
+/var/www/tatajestwazny/app/auth_analysis.log:729:/var/www/tatajestwazny/app/auth_analysis.log:457:/var/www/tatajestwazny/app/debug_password_hash.sh:12:# 2. Czy wygląda jak poprawny bcrypt?
+/var/www/tatajestwazny/app/auth_analysis.log:730:/var/www/tatajestwazny/app/auth_analysis.log:458:/var/www/tatajestwazny/app/debug_password_hash.sh:13:if [[ $HASH =~ ^\$2[aby]?\$[0-9]{2}\$.*$ ]]; then
+/var/www/tatajestwazny/app/auth_analysis.log:731:/var/www/tatajestwazny/app/auth_analysis.log:459:/var/www/tatajestwazny/app/debug_password_hash.sh:14:  echo "✅ Format hash wygląda poprawnie (bcrypt)"
+/var/www/tatajestwazny/app/auth_analysis.log:732:/var/www/tatajestwazny/app/auth_analysis.log:460:/var/www/tatajestwazny/app/debug_password_hash.sh:16:  echo "❌ Format nie wygląda jak poprawny hash bcrypt!"
+/var/www/tatajestwazny/app/auth_analysis.log:733:/var/www/tatajestwazny/app/auth_analysis.log:461:/var/www/tatajestwazny/app/debug_password_hash.sh:19:# 3. Test manualnego hashowania
+/var/www/tatajestwazny/app/auth_analysis.log:734:/var/www/tatajestwazny/app/auth_analysis.log:462:/var/www/tatajestwazny/app/debug_password_hash.sh:21:PHP_VERIFY=$(php -r "echo password_verify('$TEST_PASS', '$HASH') ? '✅ Hasło OK' : '❌ Hasło NIE PASUJE';")
+/var/www/tatajestwazny/app/auth_analysis.log:735:/var/www/tatajestwazny/app/auth_analysis.log:463:/var/www/tatajestwazny/app/debug_password_hash.sh:22:echo -e "\n🧪 2. Test password_verify() w PHP:\n$PHP_VERIFY"
+/var/www/tatajestwazny/app/auth_analysis.log:736:/var/www/tatajestwazny/app/auth_analysis.log:464:/var/www/tatajestwazny/app/debug_password_hash.sh:24:# 4. Dodatkowo spróbuj hashować i porównać
+/var/www/tatajestwazny/app/auth_analysis.log:737:/var/www/tatajestwazny/app/auth_analysis.log:465:/var/www/tatajestwazny/app/debug_password_hash.sh:25:NEW_HASH=$(php -r "echo password_hash('$TEST_PASS', PASSWORD_BCRYPT);")
+/var/www/tatajestwazny/app/auth_analysis.log:738:/var/www/tatajestwazny/app/auth_analysis.log:466:/var/www/tatajestwazny/app/debug_password_hash.sh:26:echo -e "\n🔁 3. Nowy hash tego samego hasła (dla porównania):"
+/var/www/tatajestwazny/app/auth_analysis.log:739:/var/www/tatajestwazny/app/auth_analysis.log:467:/var/www/tatajestwazny/app/debug_password_hash.sh:27:echo "$NEW_HASH"
+/var/www/tatajestwazny/app/auth_analysis.log:740:/var/www/tatajestwazny/app/auth_analysis.log:468:/var/www/tatajestwazny/app/debug_password_hash.sh:30:echo -e "\n🌍 4. Sprawdzenie dostępności AUTH_PASSWORD_HASH przez PHP (getenv + $_ENV):"
+/var/www/tatajestwazny/app/auth_analysis.log:741:/var/www/tatajestwazny/app/auth_analysis.log:469:/var/www/tatajestwazny/app/debug_password_hash.sh:32:\$env = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:742:/var/www/tatajestwazny/app/auth_analysis.log:470:/var/www/tatajestwazny/app/debug_password_hash.sh:33:\$superglobal = \$_ENV['AUTH_PASSWORD_HASH'] ?? null;
+/var/www/tatajestwazny/app/auth_analysis.log:743:/var/www/tatajestwazny/app/auth_analysis.log:471:/var/www/tatajestwazny/app/debug_password_hash.sh:38:# 6. Szybka walidacja auth.php jeśli istnieje
+/var/www/tatajestwazny/app/auth_analysis.log:744:/var/www/tatajestwazny/app/auth_analysis.log:472:/var/www/tatajestwazny/app/debug_password_hash.sh:39:if [[ -f public/auth.php ]]; then
+/var/www/tatajestwazny/app/auth_analysis.log:745:/var/www/tatajestwazny/app/auth_analysis.log:473:/var/www/tatajestwazny/app/debug_password_hash.sh:40:  echo -e "\n📄 5. Sprawdzenie, czy auth.php ładuje .env..."
+/var/www/tatajestwazny/app/auth_analysis.log:746:/var/www/tatajestwazny/app/auth_analysis.log:474:/var/www/tatajestwazny/app/debug_password_hash.sh:41:  if grep -q "AUTH_PASSWORD_HASH" public/auth.php; then
+/var/www/tatajestwazny/app/auth_analysis.log:747:/var/www/tatajestwazny/app/auth_analysis.log:475:/var/www/tatajestwazny/app/debug_password_hash.sh:42:    echo "✅ auth.php używa AUTH_PASSWORD_HASH"
+/var/www/tatajestwazny/app/auth_analysis.log:748:/var/www/tatajestwazny/app/auth_analysis.log:476:/var/www/tatajestwazny/app/debug_password_hash.sh:44:    echo "❌ auth.php nie używa AUTH_PASSWORD_HASH!"
+/var/www/tatajestwazny/app/auth_analysis.log:749:/var/www/tatajestwazny/app/auth_analysis.log:477:/var/www/tatajestwazny/app/debug_password_hash.sh:49:echo "🔧 Jeśli chcesz naprawić, uruchom ponownie: ./reset_admin_password.sh"
+/var/www/tatajestwazny/app/auth_analysis.log:750:/var/www/tatajestwazny/app/auth_analysis.log:494:/var/www/tatajestwazny/app/reset_admin_password.sh:102:hash=$(php -r 'echo password_hash($argv[1], PASSWORD_DEFAULT);' "$password")
+/var/www/tatajestwazny/app/auth_analysis.log:751:/var/www/tatajestwazny/app/auth_analysis.log:497:/var/www/tatajestwazny/app/reset_admin_password.sh:106:  echo "AUTH_PASSWORD_HASH=\"$hash\""
+/var/www/tatajestwazny/app/auth_analysis.log:752:/var/www/tatajestwazny/app/auth_analysis.log:498:/var/www/tatajestwazny/app/reset_admin_password.sh:121:if grep -q '^AUTH_PASSWORD_HASH=' "$new_tmp"; then
+/var/www/tatajestwazny/app/auth_analysis.log:753:/var/www/tatajestwazny/app/auth_analysis.log:499:/var/www/tatajestwazny/app/reset_admin_password.sh:122:  sed -i "s|^AUTH_PASSWORD_HASH=.*|AUTH_PASSWORD_HASH=\"$hash\"|" "$new_tmp"
+/var/www/tatajestwazny/app/auth_analysis.log:754:/var/www/tatajestwazny/app/auth_analysis.log:500:/var/www/tatajestwazny/app/reset_admin_password.sh:130:  printf 'AUTH_PASSWORD_HASH="%s"\n' "$hash" >>"$new_tmp"
+/var/www/tatajestwazny/app/auth_analysis.log:755:/var/www/tatajestwazny/app/auth_analysis.log:505:/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:17:$currentHash = $envVars['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/auth_analysis.log:756:/var/www/tatajestwazny/app/auth_analysis.log:510:/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:31:        $newHash = password_hash($new, PASSWORD_DEFAULT);
+/var/www/tatajestwazny/app/auth_analysis.log:757:/var/www/tatajestwazny/app/auth_analysis.log:511:/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:34:            if (str_starts_with($line, 'AUTH_PASSWORD_HASH=')) {
+/var/www/tatajestwazny/app/auth_analysis.log:758:/var/www/tatajestwazny/app/auth_analysis.log:512:/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:35:                $line = "AUTH_PASSWORD_HASH=\"$newHash\"\n";
+/var/www/tatajestwazny/app/auth_analysis.log:759:/var/www/tatajestwazny/app/auth_analysis.log:532:🔍 Szukanie funkcji password_verify / password_hash:
+/var/www/tatajestwazny/app/auth_analysis.log:760:/var/www/tatajestwazny/app/auth_analysis.log:544:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:761:/var/www/tatajestwazny/app/auth_analysis.log:545:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:762:/var/www/tatajestwazny/app/auth_analysis.log:562:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:763:/var/www/tatajestwazny/app/auth_analysis.log:563:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:764:/var/www/tatajestwazny/app/auth_analysis.log:580:/var/www/tatajestwazny/app/auth_analysis.log:314:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:765:/var/www/tatajestwazny/app/auth_analysis.log:581:/var/www/tatajestwazny/app/auth_analysis.log:315:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:766:/var/www/tatajestwazny/app/auth_analysis.log:587:/var/www/tatajestwazny/app/auth_analysis.log:462:/var/www/tatajestwazny/app/debug_password_hash.sh:21:PHP_VERIFY=$(php -r "echo password_verify('$TEST_PASS', '$HASH') ? '✅ Hasło OK' : '❌ Hasło NIE PASUJE';")
+/var/www/tatajestwazny/app/auth_analysis.log:767:/var/www/tatajestwazny/app/auth_analysis.log:588:/var/www/tatajestwazny/app/auth_analysis.log:463:/var/www/tatajestwazny/app/debug_password_hash.sh:22:echo -e "\n🧪 2. Test password_verify() w PHP:\n$PHP_VERIFY"
+/var/www/tatajestwazny/app/auth_analysis.log:768:/var/www/tatajestwazny/app/auth_analysis.log:590:/var/www/tatajestwazny/app/auth_analysis.log:532:🔍 Szukanie funkcji password_verify / password_hash:
+/var/www/tatajestwazny/app/auth_analysis.log:769:/var/www/tatajestwazny/app/auth_analysis.log:602:/var/www/tatajestwazny/app/auth_analysis.log:544:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:770:/var/www/tatajestwazny/app/auth_analysis.log:603:/var/www/tatajestwazny/app/auth_analysis.log:545:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:771:/var/www/tatajestwazny/app/auth_analysis.log:620:/var/www/tatajestwazny/app/auth_analysis.log:562:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:772:/var/www/tatajestwazny/app/auth_analysis.log:621:/var/www/tatajestwazny/app/auth_analysis.log:563:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:773:/var/www/tatajestwazny/app/auth_analysis.log:638:/var/www/tatajestwazny/app/auth_analysis.log:580:/var/www/tatajestwazny/app/auth_analysis.log:314:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:774:/var/www/tatajestwazny/app/auth_analysis.log:639:/var/www/tatajestwazny/app/auth_analysis.log:581:/var/www/tatajestwazny/app/auth_analysis.log:315:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:775:/var/www/tatajestwazny/app/auth_analysis.log:644:/var/www/tatajestwazny/app/debug_password_hash.sh:21:PHP_VERIFY=$(php -r "echo password_verify('$TEST_PASS', '$HASH') ? '✅ Hasło OK' : '❌ Hasło NIE PASUJE';")
+/var/www/tatajestwazny/app/auth_analysis.log:776:/var/www/tatajestwazny/app/auth_analysis.log:645:/var/www/tatajestwazny/app/debug_password_hash.sh:22:echo -e "\n🧪 2. Test password_verify() w PHP:\n$PHP_VERIFY"
+/var/www/tatajestwazny/app/auth_analysis.log:777:/var/www/tatajestwazny/app/auth_analysis.log:647:/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/auth_analysis.log:778:/var/www/tatajestwazny/app/auth_analysis.log:648:/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/auth_analysis.log:779:/var/www/tatajestwazny/app/auth_analysis.log:649:/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:780:/var/www/tatajestwazny/app/auth_analysis.log:650:/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/auth_analysis.log:781:/var/www/tatajestwazny/app/auth_analysis.log:651:/var/www/tatajestwazny/app/test_auth_env.sh:10:  grep AUTH_PASSWORD_HASH .env || echo "❌ Brak AUTH_PASSWORD_HASH w .env"
+/var/www/tatajestwazny/app/auth_analysis.log:782:/var/www/tatajestwazny/app/auth_analysis.log:652:/var/www/tatajestwazny/app/test_auth_env.sh:14:HASH=$(grep AUTH_PASSWORD_HASH .env | cut -d'=' -f2 | tr -d '"')
+/var/www/tatajestwazny/app/auth_analysis.log:783:/var/www/tatajestwazny/app/auth_analysis.log:653:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:20:  HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:784:/var/www/tatajestwazny/app/auth_analysis.log:654:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:21:  echo "AUTH_PASSWORD_HASH='$HASH'" > "$ENV_FILE"
+/var/www/tatajestwazny/app/auth_analysis.log:785:/var/www/tatajestwazny/app/auth_analysis.log:655:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:31:$hash = getenv('AUTH_PASSWORD_HASH') ?: (getenv('AUTH_PASSWORD_HASH') ?? '');
+/var/www/tatajestwazny/app/auth_analysis.log:786:/var/www/tatajestwazny/app/auth_analysis.log:656:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:34:  die('❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:787:/var/www/tatajestwazny/app/auth_analysis.log:657:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:119:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:788:/var/www/tatajestwazny/app/auth_analysis.log:658:/var/www/tatajestwazny/app/analyze_auth.php:10:    'password_hash',
+/var/www/tatajestwazny/app/auth_analysis.log:789:/var/www/tatajestwazny/app/auth_analysis.log:659:/var/www/tatajestwazny/app/analyze_auth.php:53:        echo "   docker exec -it tjw_php php -r 'echo password_hash(\"NOWE_HASLO\", PASSWORD_BCRYPT).\"\\n\";'\n";
+/var/www/tatajestwazny/app/auth_analysis.log:790:/var/www/tatajestwazny/app/auth_analysis.log:660:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:791:/var/www/tatajestwazny/app/auth_analysis.log:661:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:792:/var/www/tatajestwazny/app/auth_analysis.log:662:/var/www/tatajestwazny/app/analyze_admin_auth.sh:41:grep -Rin "password_hash" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:793:/var/www/tatajestwazny/app/auth_analysis.log:663:/var/www/tatajestwazny/app/deploy_auth_module.sh:8:HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:794:/var/www/tatajestwazny/app/auth_analysis.log:664:/var/www/tatajestwazny/app/deploy_auth_module.sh:9:echo "AUTH_PASSWORD_HASH=\"$HASH\"" > .env
+/var/www/tatajestwazny/app/auth_analysis.log:795:/var/www/tatajestwazny/app/auth_analysis.log:665:/var/www/tatajestwazny/app/deploy_auth_module.sh:35:\$storedHash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:796:/var/www/tatajestwazny/app/auth_analysis.log:666:/var/www/tatajestwazny/app/deploy_auth_module.sh:116:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:797:/var/www/tatajestwazny/app/auth_analysis.log:667:/var/www/tatajestwazny/app/full_auth_debug.sh:13:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env || echo "❌ Brak zmiennej AUTH_PASSWORD_HASH")
+/var/www/tatajestwazny/app/auth_analysis.log:798:/var/www/tatajestwazny/app/auth_analysis.log:668:/var/www/tatajestwazny/app/full_auth_debug.sh:19:\$hash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:799:/var/www/tatajestwazny/app/auth_analysis.log:669:/var/www/tatajestwazny/app/full_auth_debug.sh:23:        if (strpos(\$line, 'AUTH_PASSWORD_HASH=') === 0) {
+/var/www/tatajestwazny/app/auth_analysis.log:800:/var/www/tatajestwazny/app/auth_analysis.log:670:/var/www/tatajestwazny/app/fix_auth_php.sh:25:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/auth_analysis.log:801:/var/www/tatajestwazny/app/auth_analysis.log:671:/var/www/tatajestwazny/app/auth_analysis.log:18:/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/auth_analysis.log:802:/var/www/tatajestwazny/app/auth_analysis.log:672:/var/www/tatajestwazny/app/auth_analysis.log:19:/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/auth_analysis.log:803:/var/www/tatajestwazny/app/auth_analysis.log:673:/var/www/tatajestwazny/app/auth_analysis.log:26:/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:804:/var/www/tatajestwazny/app/auth_analysis.log:674:/var/www/tatajestwazny/app/auth_analysis.log:28:/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/auth_analysis.log:805:/var/www/tatajestwazny/app/auth_analysis.log:675:/var/www/tatajestwazny/app/auth_analysis.log:50:/var/www/tatajestwazny/app/test_auth_env.sh:10:  grep AUTH_PASSWORD_HASH .env || echo "❌ Brak AUTH_PASSWORD_HASH w .env"
+/var/www/tatajestwazny/app/auth_analysis.log:806:/var/www/tatajestwazny/app/auth_analysis.log:676:/var/www/tatajestwazny/app/auth_analysis.log:52:/var/www/tatajestwazny/app/test_auth_env.sh:14:HASH=$(grep AUTH_PASSWORD_HASH .env | cut -d'=' -f2 | tr -d '"')
+/var/www/tatajestwazny/app/auth_analysis.log:807:/var/www/tatajestwazny/app/auth_analysis.log:677:/var/www/tatajestwazny/app/auth_analysis.log:69:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:20:  HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:808:/var/www/tatajestwazny/app/auth_analysis.log:678:/var/www/tatajestwazny/app/auth_analysis.log:70:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:21:  echo "AUTH_PASSWORD_HASH='$HASH'" > "$ENV_FILE"
+/var/www/tatajestwazny/app/auth_analysis.log:809:/var/www/tatajestwazny/app/auth_analysis.log:679:/var/www/tatajestwazny/app/auth_analysis.log:74:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:31:$hash = getenv('AUTH_PASSWORD_HASH') ?: (getenv('AUTH_PASSWORD_HASH') ?? '');
+/var/www/tatajestwazny/app/auth_analysis.log:810:/var/www/tatajestwazny/app/auth_analysis.log:680:/var/www/tatajestwazny/app/auth_analysis.log:76:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:34:  die('❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:811:/var/www/tatajestwazny/app/auth_analysis.log:681:/var/www/tatajestwazny/app/auth_analysis.log:81:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:119:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:812:/var/www/tatajestwazny/app/auth_analysis.log:682:/var/www/tatajestwazny/app/auth_analysis.log:87:/var/www/tatajestwazny/app/analyze_auth.php:10:    'password_hash',
+/var/www/tatajestwazny/app/auth_analysis.log:813:/var/www/tatajestwazny/app/auth_analysis.log:683:/var/www/tatajestwazny/app/auth_analysis.log:94:/var/www/tatajestwazny/app/analyze_auth.php:53:        echo "   docker exec -it tjw_php php -r 'echo password_hash(\"NOWE_HASLO\", PASSWORD_BCRYPT).\"\\n\";'\n";
+/var/www/tatajestwazny/app/auth_analysis.log:814:/var/www/tatajestwazny/app/auth_analysis.log:684:/var/www/tatajestwazny/app/auth_analysis.log:105:/var/www/tatajestwazny/app/analyze_admin_auth.sh:38:# 5️⃣ Szukanie użycia funkcji password_verify() lub password_hash()
+/var/www/tatajestwazny/app/auth_analysis.log:815:/var/www/tatajestwazny/app/auth_analysis.log:685:/var/www/tatajestwazny/app/auth_analysis.log:106:/var/www/tatajestwazny/app/analyze_admin_auth.sh:39:echo -e "\n🔍 Szukanie funkcji password_verify / password_hash:" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:816:/var/www/tatajestwazny/app/auth_analysis.log:686:/var/www/tatajestwazny/app/auth_analysis.log:108:/var/www/tatajestwazny/app/analyze_admin_auth.sh:41:grep -Rin "password_hash" "$APP_PATH" | tee -a $LOG_FILE
+/var/www/tatajestwazny/app/auth_analysis.log:817:/var/www/tatajestwazny/app/auth_analysis.log:687:/var/www/tatajestwazny/app/auth_analysis.log:128:/var/www/tatajestwazny/app/deploy_auth_module.sh:8:HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:818:/var/www/tatajestwazny/app/auth_analysis.log:688:/var/www/tatajestwazny/app/auth_analysis.log:129:/var/www/tatajestwazny/app/deploy_auth_module.sh:9:echo "AUTH_PASSWORD_HASH=\"$HASH\"" > .env
+/var/www/tatajestwazny/app/auth_analysis.log:819:/var/www/tatajestwazny/app/auth_analysis.log:689:/var/www/tatajestwazny/app/auth_analysis.log:133:/var/www/tatajestwazny/app/deploy_auth_module.sh:35:\$storedHash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:820:/var/www/tatajestwazny/app/auth_analysis.log:690:/var/www/tatajestwazny/app/auth_analysis.log:138:/var/www/tatajestwazny/app/deploy_auth_module.sh:116:echo "👉 Upewnij się, że zmienna AUTH_PASSWORD_HASH jest załadowana:"
+/var/www/tatajestwazny/app/auth_analysis.log:821:/var/www/tatajestwazny/app/auth_analysis.log:691:/var/www/tatajestwazny/app/auth_analysis.log:155:/var/www/tatajestwazny/app/full_auth_debug.sh:13:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env || echo "❌ Brak zmiennej AUTH_PASSWORD_HASH")
+/var/www/tatajestwazny/app/auth_analysis.log:822:/var/www/tatajestwazny/app/auth_analysis.log:692:/var/www/tatajestwazny/app/auth_analysis.log:158:/var/www/tatajestwazny/app/full_auth_debug.sh:19:\$hash = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:823:/var/www/tatajestwazny/app/auth_analysis.log:693:/var/www/tatajestwazny/app/auth_analysis.log:160:/var/www/tatajestwazny/app/full_auth_debug.sh:23:        if (strpos(\$line, 'AUTH_PASSWORD_HASH=') === 0) {
+/var/www/tatajestwazny/app/auth_analysis.log:824:/var/www/tatajestwazny/app/auth_analysis.log:694:/var/www/tatajestwazny/app/auth_analysis.log:181:/var/www/tatajestwazny/app/fix_auth_php.sh:25:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/auth_analysis.log:825:/var/www/tatajestwazny/app/auth_analysis.log:695:/var/www/tatajestwazny/app/auth_analysis.log:227:/var/www/tatajestwazny/app/auth_analysis.log:18:/var/www/tatajestwazny/app/diagnose_tjw.sh:72:    grep AUTH_PASSWORD_HASH .env || echo "⚠️  AUTH_PASSWORD_HASH nie znaleziony"
+/var/www/tatajestwazny/app/auth_analysis.log:826:/var/www/tatajestwazny/app/auth_analysis.log:696:/var/www/tatajestwazny/app/auth_analysis.log:228:/var/www/tatajestwazny/app/auth_analysis.log:19:/var/www/tatajestwazny/app/.env:1:AUTH_PASSWORD_HASH="$2y$10$Yu4u9ksNpGn/BM2WaR5/K.YsqQpaMlncx6ohlLz2PjAEtPbY3Etiq"
+/var/www/tatajestwazny/app/auth_analysis.log:827:/var/www/tatajestwazny/app/auth_analysis.log:697:/var/www/tatajestwazny/app/auth_analysis.log:235:/var/www/tatajestwazny/app/auth_analysis.log:26:/var/www/tatajestwazny/app/public/admin/auth.php:12:$hash = $_ENV['AUTH_PASSWORD_HASH'] ?? getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/auth_analysis.log:828:/var/www/tatajestwazny/app/auth_analysis.log:698:/var/www/tatajestwazny/app/auth_analysis.log:237:/var/www/tatajestwazny/app/auth_analysis.log:28:/var/www/tatajestwazny/app/public/admin/auth.php:15:    echo '❌ Brakuje zmiennej środowiskowej AUTH_PASSWORD_HASH.';
+/var/www/tatajestwazny/app/auth_analysis.log:829:/var/www/tatajestwazny/app/auth_analysis.log:699:/var/www/tatajestwazny/app/auth_analysis.log:259:/var/www/tatajestwazny/app/auth_analysis.log:50:/var/www/tatajestwazny/app/test_auth_env.sh:10:  grep AUTH_PASSWORD_HASH .env || echo "❌ Brak AUTH_PASSWORD_HASH w .env"
+/var/www/tatajestwazny/app/auth_analysis.log:830:/var/www/tatajestwazny/app/auth_analysis.log:700:/var/www/tatajestwazny/app/auth_analysis.log:261:/var/www/tatajestwazny/app/auth_analysis.log:52:/var/www/tatajestwazny/app/test_auth_env.sh:14:HASH=$(grep AUTH_PASSWORD_HASH .env | cut -d'=' -f2 | tr -d '"')
+/var/www/tatajestwazny/app/auth_analysis.log:831:/var/www/tatajestwazny/app/auth_analysis.log:701:/var/www/tatajestwazny/app/auth_analysis.log:278:/var/www/tatajestwazny/app/auth_analysis.log:69:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:20:  HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_DEFAULT);")
+/var/www/tatajestwazny/app/auth_analysis.log:832:/var/www/tatajestwazny/app/auth_analysis.log:702:/var/www/tatajestwazny/app/auth_analysis.log:279:/var/www/tatajestwazny/app/auth_analysis.log:70:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:21:  echo "AUTH_PASSWORD_HASH='$HASH'" > "$ENV_FILE"
+/var/www/tatajestwazny/app/auth_analysis.log:833:/var/www/tatajestwazny/app/auth_analysis.log:703:/var/www/tatajestwazny/app/auth_analysis.log:283:/var/www/tatajestwazny/app/auth_analysis.log:74:/var/www/tatajestwazny/app/deploy_auth_and_blog_security.sh:31:$hash = getenv('AUTH_PASSWORD_HASH') ?: (getenv('AUTH_PASSWORD_HASH') ?? '');
+/var/www/tatajestwazny/app/debug_password_hash.sh:6:HASH_LINE=$(grep AUTH_PASSWORD_HASH .env)
+/var/www/tatajestwazny/app/debug_password_hash.sh:25:NEW_HASH=$(php -r "echo password_hash('$TEST_PASS', PASSWORD_BCRYPT);")
+/var/www/tatajestwazny/app/debug_password_hash.sh:30:echo -e "\n🌍 4. Sprawdzenie dostępności AUTH_PASSWORD_HASH przez PHP (getenv + $_ENV):"
+/var/www/tatajestwazny/app/debug_password_hash.sh:32:\$env = getenv('AUTH_PASSWORD_HASH');
+/var/www/tatajestwazny/app/debug_password_hash.sh:33:\$superglobal = \$_ENV['AUTH_PASSWORD_HASH'] ?? null;
+/var/www/tatajestwazny/app/debug_password_hash.sh:41:  if grep -q "AUTH_PASSWORD_HASH" public/auth.php; then
+/var/www/tatajestwazny/app/debug_password_hash.sh:42:    echo "✅ auth.php używa AUTH_PASSWORD_HASH"
+/var/www/tatajestwazny/app/debug_password_hash.sh:44:    echo "❌ auth.php nie używa AUTH_PASSWORD_HASH!"
+/var/www/tatajestwazny/app/reset_admin_password.sh:102:hash=$(php -r 'echo password_hash($argv[1], PASSWORD_DEFAULT);' "$password")
+/var/www/tatajestwazny/app/reset_admin_password.sh:106:  echo "AUTH_PASSWORD_HASH=\"$hash\""
+/var/www/tatajestwazny/app/reset_admin_password.sh:121:if grep -q '^AUTH_PASSWORD_HASH=' "$new_tmp"; then
+/var/www/tatajestwazny/app/reset_admin_password.sh:122:  sed -i "s|^AUTH_PASSWORD_HASH=.*|AUTH_PASSWORD_HASH=\"$hash\"|" "$new_tmp"
+/var/www/tatajestwazny/app/reset_admin_password.sh:130:  printf 'AUTH_PASSWORD_HASH="%s"\n' "$hash" >>"$new_tmp"
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:17:$currentHash = $envVars['AUTH_PASSWORD_HASH'] ?? '';
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:31:        $newHash = password_hash($new, PASSWORD_DEFAULT);
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:34:            if (str_starts_with($line, 'AUTH_PASSWORD_HASH=')) {
+/var/www/tatajestwazny/app/deploy_admin_password_reset.sh:35:                $line = "AUTH_PASSWORD_HASH=\"$newHash\"\n";
+
+📜 Fragment pliku auth.php (pierwsze 40 linii):
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Ensures that the PHP session is started with hardened cookie options.
+ */
+function ensure_secure_session(): void
+{
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        return;
+    }
+
+    ini_set('session.use_strict_mode', '1');
+
+    $params = session_get_cookie_params();
+    $secure = (!empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443);
+
+    $cookieParams = [
+        'lifetime' => $params['lifetime'] ?? 0,
+        'path' => $params['path'] ?? '/',
+        'domain' => $params['domain'] ?? '',
+        'secure' => $secure,
+        'httponly' => true,
+        'samesite' => $params['samesite'] ?? 'Lax',
+    ];
+
+    session_set_cookie_params($cookieParams);
+
+    if (!headers_sent()) {
+        ini_set('session.cookie_httponly', '1');
+        ini_set('session.cookie_samesite', $cookieParams['samesite']);
+        ini_set('session.cookie_secure', $secure ? '1' : '0');
+    }
+
+    session_start();
+}
+
+/**

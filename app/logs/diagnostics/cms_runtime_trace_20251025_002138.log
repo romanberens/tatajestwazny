@@ -1,0 +1,7 @@
+[00:21:38] === 🚦 CMS RUNTIME TRACE START ===
+[00:21:38] 🧩 INIT PagesRepository + test handlePagesPost()
+[00:21:38] → CALL: handlePagesPost()
+[00:21:38] ← RETURN: handlePagesPost() OK (0.42 ms)
+[00:21:38] 🧩 Weryfikacja wpisu w bazie
+[00:21:38] ✅ Last inserted: ID=3, slug=test-page, title=Strona testowa, body_len=36
+[00:21:38] === ✅ CMS RUNTIME TRACE END ===

@@ -1,0 +1,4 @@
+[2025-10-24 22:56:37] === 🌐 START API POST TEST ===
+[2025-10-24 22:56:37] CSRF: 
+[2025-10-24 22:56:37] ✅ Formularz POST wysłany. Sprawdź logi runtime trace i bazę danych.
+[2025-10-24 22:56:37] === ✅ END API POST TEST ===
